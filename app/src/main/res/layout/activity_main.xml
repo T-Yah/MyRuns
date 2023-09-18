@@ -32,12 +32,13 @@
                 android:id="@+id/profilePhoto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@tools:sample/avatars" />
+                android:src="@drawable/ic_launcher_foreground" />
 
             <Button
                 android:id="@+id/changePfpBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="Change" />
 
             <TextView
@@ -142,14 +143,14 @@
                 android:minHeight="48dp" />
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/saveBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:baselineAligned="false"
                 android:text="Save" />
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/cancelBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Cancel" />
