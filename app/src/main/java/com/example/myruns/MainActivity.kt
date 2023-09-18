@@ -28,25 +28,22 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, "You clicked me.", Toast.LENGTH_SHORT).show()
         }
     }
+    //ref: https://www.javatpoint.com/kotlin-android-alertdialog#:~:text=Builder%20class%20call%20the%20setTitle,neutral%20and%20negative%20action%20respectively.
     private fun cancelCheck(){
         //Make sure user wants to clear with alert dialog
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Clear Inputted Data")
         builder.setMessage("This will clear all unsaved data. Do you wish to continue")
-        //builder.setIcon(android.R.drawable.ic_dialog_alert)
 
-        //performing positive action
         builder.setPositiveButton("Yes"){dialogInterface, which ->
-            cancelAction()
+            cancelAction() //on yes click
         }
-        //performing negative action
         builder.setNegativeButton("No"){dialogInterface, which ->
-            //do nothing
+            //on no click do nothing
         }
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
-        alertDialog.setCancelable(false)
+        alertDialog.setCancelable(false) //cannot click out, must select an option
         alertDialog.show()
     }
 
