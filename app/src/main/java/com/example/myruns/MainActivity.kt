@@ -30,8 +30,6 @@ class MainActivity : AppCompatActivity() {
         saveBtn.setOnClickListener{
             if (ifSavable()){
                 saveAction()
-                Toast.makeText(this@MainActivity, "To Be Saved.", Toast.LENGTH_SHORT).show()
-
             }
         }
         val changeBtn = findViewById<Button>(R.id.changePfpBtn)
@@ -40,8 +38,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadProfile(){
-        //Grab Objects on Page
+    private fun loadProfile() {
+        // Grab Objects on Page
         val nameField = findViewById<EditText>(R.id.enterName)
         val emailField = findViewById<EditText>(R.id.enterEmail)
         val phoneField = findViewById<EditText>(R.id.enterPhone)
@@ -52,27 +50,51 @@ class MainActivity : AppCompatActivity() {
 
         val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
 
-        val name = sharedPref.getString("name", "")
-        val email = sharedPref.getString("email", "")
-        val phone = sharedPref.getString("phone", "")
-        val className = sharedPref.getString("class", "")
-        val major = sharedPref.getString("major", "")
-        val genderF = sharedPref.getBoolean("female", false)
-        val genderM = sharedPref.getBoolean("male", false)
+        // Check if it's the first run
+        val isFirstRun = sharedPref.getBoolean("isFirstRun", true)
 
-        nameField.setText(name)
-        emailField.setText(email)
-        phoneField.setText(phone)
-        classField.setText(className)
-        majorField.setText(major)
+        if (isFirstRun) {
+            // Handle the case of the first run, initialize default values or perform necessary actions
 
-        if(genderF){
-            radioF.isChecked = true
-        }
-        if(genderM){
-            radioM.isChecked = true
+            // For example, set default values in the EditText fields
+            nameField.setText("")
+            emailField.setText("")
+            phoneField.setText("")
+            classField.setText("")
+            majorField.setText("")
+
+            // Set a default gender state (e.g., female) or clear radio buttons
+            radioF.isChecked = false
+            radioM.isChecked = false
+
+            // Mark that it's not the first run anymore
+            sharedPref.edit().putBoolean("isFirstRun", false).apply()
+        } else {
+            // Retrieve data from SharedPreferences
+            val name = sharedPref.getString("name", "")
+            val email = sharedPref.getString("email", "")
+            val phone = sharedPref.getString("phone", "")
+            val className = sharedPref.getString("class", "")
+            val major = sharedPref.getString("major", "")
+            val genderF = sharedPref.getBoolean("female", false)
+            val genderM = sharedPref.getBoolean("male", false)
+
+            // Set the retrieved data in the EditText fields
+            nameField.setText(name)
+            emailField.setText(email)
+            phoneField.setText(phone)
+            classField.setText(className)
+            majorField.setText(major)
+
+            if (genderF) {
+                radioF.isChecked = true
+            }
+            if (genderM) {
+                radioM.isChecked = true
+            }
         }
     }
+
     //ref: https://www.javatpoint.com/kotlin-android-alertdialog#:~:text=Builder%20class%20call%20the%20setTitle,neutral%20and%20negative%20action%20respectively.
     //Function to check if user actually wants to do the cancel option
     private fun cancelCheck(){
@@ -157,5 +179,7 @@ class MainActivity : AppCompatActivity() {
         editor.putBoolean("female", radioF.isChecked());
         editor.putBoolean("male", radioM.isChecked());
         editor.commit()
+
+        Toast.makeText(this@MainActivity, "Data Saved", Toast.LENGTH_SHORT).show()
     }
 }
