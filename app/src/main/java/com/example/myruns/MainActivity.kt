@@ -19,7 +19,11 @@ class MainActivity : AppCompatActivity() {
 //        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
 //        setSupportActionBar(toolbar)
 
-        //loadProfile() //load the information back onto the screen if there is
+        //for testing shared preferences: clear save data
+//        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
+//        sharedPref.edit().clear().commit()
+
+        loadProfile()
 
         //On Click Listeners for Buttons
         val cancelBtn = findViewById<Button>(R.id.cancelBtn)
@@ -38,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //Function to check if there is a previous saved instance, if so --> load it in, if not --> create empty activity
     private fun loadProfile() {
         // Grab Objects on Page
         val nameField = findViewById<EditText>(R.id.enterName)
@@ -48,44 +53,42 @@ class MainActivity : AppCompatActivity() {
         val radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
         val radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
 
+        //reference the shared prefernce object
         val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
 
-        // Check if it's the first run
+        // Check if there is any previous data
         val isFirstRun = sharedPref.getBoolean("isFirstRun", true)
 
-        if (isFirstRun) {
-            // Handle the case of the first run, initialize default values or perform necessary actions
+        if (isFirstRun) { //if there is no previous data
 
-            // For example, set default values in the EditText fields
+            //set fields to empty
             nameField.setText("")
             emailField.setText("")
             phoneField.setText("")
             classField.setText("")
             majorField.setText("")
-
-            // Set a default gender state (e.g., female) or clear radio buttons
             radioF.isChecked = false
             radioM.isChecked = false
 
-            // Mark that it's not the first run anymore
+            //Mark so we know it is no longer the first run
             sharedPref.edit().putBoolean("isFirstRun", false).apply()
-        } else {
+        }
+        else { //we have previous data, must load into fields
             // Retrieve data from SharedPreferences
             val name = sharedPref.getString("name", "")
             val email = sharedPref.getString("email", "")
             val phone = sharedPref.getString("phone", "")
             val className = sharedPref.getString("class", "")
             val major = sharedPref.getString("major", "")
-            val genderF = sharedPref.getBoolean("female", false)
-            val genderM = sharedPref.getBoolean("male", false)
+            val genderF = sharedPref.getBoolean("female", true)
+            val genderM = sharedPref.getBoolean("male", true)
 
-            // Set the retrieved data in the EditText fields
+            // Set the retrieved data in the fields
             nameField.setText(name)
             emailField.setText(email)
             phoneField.setText(phone)
             classField.setText(className)
             majorField.setText(major)
-
             if (genderF) {
                 radioF.isChecked = true
             }
@@ -101,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         //Make sure user wants to clear with alert dialog
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Clear Inputted Data")
-        builder.setMessage("This will clear all unsaved data. Do you wish to continue")
+        builder.setMessage("This will clear all unsaved data. Do you wish to continue?")
 
         builder.setPositiveButton("Yes"){dialogInterface, which ->
             cancelAction() //on yes click
@@ -135,6 +138,7 @@ class MainActivity : AppCompatActivity() {
         classField.text.clear()
         majorField.text.clear()
     }
+    //Function to check if all fields contain data, if so it is saveable
     private fun ifSavable() : Boolean {
         //Grab Objects on Page
         val nameField = findViewById<EditText>(R.id.enterName)
@@ -158,6 +162,7 @@ class MainActivity : AppCompatActivity() {
             return true
         }
     }
+    //Function to save inputted data into sharedprefernces
     private fun saveAction(){
         //Grab Objects on Page
         val nameField = findViewById<EditText>(R.id.enterName)
@@ -173,8 +178,8 @@ class MainActivity : AppCompatActivity() {
         //.getText().toString() changes from edittext to string
         editor.putString("name", nameField.getText().toString())
         editor.putString("email", emailField.getText().toString())
-        editor.putInt("phone", Integer.parseInt(phoneField.getText().toString()))
-        editor.putInt("class", Integer.parseInt(classField.getText().toString()))
+        editor.putString("phone", phoneField.getText().toString())
+        editor.putString("class", classField.getText().toString())
         editor.putString("major", majorField.getText().toString())
         editor.putBoolean("female", radioF.isChecked());
         editor.putBoolean("male", radioM.isChecked());
