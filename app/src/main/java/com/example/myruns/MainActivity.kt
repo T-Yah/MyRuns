@@ -150,7 +150,6 @@ class MainActivity : AppCompatActivity() {
 
     //Function to display a selection dialog for profile photo change
     private fun showDialog(){
-        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
 
         val options = arrayOf("Take from Camera", "Select from Gallery", "Cancel")
         val builder = AlertDialog.Builder(this)
