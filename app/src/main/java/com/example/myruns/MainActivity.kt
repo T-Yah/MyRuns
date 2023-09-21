@@ -1,5 +1,6 @@
 package com.example.myruns
 
+import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
@@ -14,6 +15,8 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.drawable.toBitmap
 import java.io.File
@@ -21,6 +24,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
+    private var imagePickerLauncher: ActivityResultLauncher<Intent>? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -30,6 +34,19 @@ class MainActivity : AppCompatActivity() {
         //for testing shared preferences: clear save data
 //        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
 //        sharedPref.edit().clear().commit()
+
+        // Initialize the imagePickerLauncher
+        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                if (data != null) {
+                    val selectedImageUri = data.data
+                    if (selectedImageUri != null) {
+                        // Process the selected image URI here
+                    }
+                }
+            }
+        }
 
         //Restore the image path in onCreate in case of a screen rotate
         if (savedInstanceState != null) {
@@ -149,7 +166,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 1 -> {
                     // Open the gallery to choose a photo
-                    // Implement this logic here
+                    val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    imagePickerLauncher?.launch(galleryIntent)
                 }
                 2 -> {
                     dialog.dismiss()
@@ -283,7 +301,7 @@ class MainActivity : AppCompatActivity() {
         return file.absolutePath
     }
 
-    //Helper function to keep updated profile photo before a save is made
+    //Helper function to keep updated profile photo before a save is made in a roatation
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         // Save the image path to the bundle
