@@ -1,16 +1,24 @@
 package com.example.myruns
 
 import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.TextUtils
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.Toast
-import android.widget.Toolbar
 import androidx.appcompat.app.AlertDialog
+import androidx.core.graphics.drawable.toBitmap
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +31,19 @@ class MainActivity : AppCompatActivity() {
 //        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
 //        sharedPref.edit().clear().commit()
 
+        //Restore the image path in onCreate in case of a screen rotate
+        if (savedInstanceState != null) {
+            val imagePath = savedInstanceState.getString("image_path")
+            if (imagePath != null && imagePath.isNotEmpty()) {
+                val imageFile = File(imagePath)
+                if (imageFile.exists()) {
+                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                    val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+                    photoImageView.setImageBitmap(imageBitmap)
+                }
+            }
+        }
+
         loadProfile()
 
         //On Click Listeners for Buttons
@@ -33,12 +54,12 @@ class MainActivity : AppCompatActivity() {
         val saveBtn = findViewById<Button>(R.id.saveBtn)
         saveBtn.setOnClickListener{
             if (ifSavable()){
-                saveAction()
+                saveProfile()
             }
         }
         val changeBtn = findViewById<Button>(R.id.changePfpBtn)
         changeBtn.setOnClickListener{
-            Toast.makeText(this@MainActivity, "You clicked me.", Toast.LENGTH_SHORT).show()
+            showDialog()
         }
     }
 
@@ -52,8 +73,9 @@ class MainActivity : AppCompatActivity() {
         val majorField = findViewById<EditText>(R.id.enterMajor)
         val radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
         val radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
+        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
 
-        //reference the shared prefernce object
+        //reference the shared preferences object
         val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
 
         // Check if there is any previous data
@@ -80,8 +102,8 @@ class MainActivity : AppCompatActivity() {
             val phone = sharedPref.getString("phone", "")
             val className = sharedPref.getString("class", "")
             val major = sharedPref.getString("major", "")
-            val genderF = sharedPref.getBoolean("female", true)
-            val genderM = sharedPref.getBoolean("male", true)
+            val genderF = sharedPref.getBoolean("female", false)
+            val genderM = sharedPref.getBoolean("male", false)
 
             // Set the retrieved data in the fields
             nameField.setText(name)
@@ -95,6 +117,57 @@ class MainActivity : AppCompatActivity() {
             if (genderM) {
                 radioM.isChecked = true
             }
+        }
+        val imagePath = sharedPref.getString("image_path", "")
+
+        if (imagePath != null) {
+            if (imagePath?.isNotEmpty() == true) {
+                val imageFile = File(imagePath)
+                if (imageFile.exists()) {
+                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                    photoImageView.setImageBitmap(imageBitmap)
+                }
+            }
+        }
+    }
+
+    //Function to display a selection dialog for profile photo change
+    private fun showDialog(){
+        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+
+        val options = arrayOf("Take from Camera", "Select from Gallery", "Cancel")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Select Profile Image")
+
+        builder.setItems(options) { dialog, which ->
+            when (which) {
+                0 -> {
+                    // Open the camera to take a photo
+                    val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    startActivityForResult(takePictureIntent, 0)
+
+                }
+                1 -> {
+                    // Open the gallery to choose a photo
+                    // Implement this logic here
+                }
+                2 -> {
+                    dialog.dismiss()
+                }
+            }
+        }
+        builder.show()
+    }
+
+    //Helper function to place the profile image into the imageview after taking a new photo
+    //ref: https://www.geeksforgeeks.org/how-to-open-camera-through-intent-and-display-captured-image-in-android/
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 0) {
+            //store photo as a bitmap
+            val photo = data?.extras?.get("data") as Bitmap
+            photoImageView.setImageBitmap(photo)
         }
     }
 
@@ -163,7 +236,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     //Function to save inputted data into sharedprefernces
-    private fun saveAction(){
+    private fun saveProfile(){
         //Grab Objects on Page
         val nameField = findViewById<EditText>(R.id.enterName)
         val emailField = findViewById<EditText>(R.id.enterEmail)
@@ -172,6 +245,9 @@ class MainActivity : AppCompatActivity() {
         val majorField = findViewById<EditText>(R.id.enterMajor)
         val radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
         val radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
+        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+
+        val imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap())
 
         val sharedPreference = getSharedPreferences("sharedPref", MODE_PRIVATE)
         var editor = sharedPreference.edit()
@@ -183,8 +259,38 @@ class MainActivity : AppCompatActivity() {
         editor.putString("major", majorField.getText().toString())
         editor.putBoolean("female", radioF.isChecked());
         editor.putBoolean("male", radioM.isChecked());
-        editor.commit()
+        editor.putString("image_path", imagePath)
+        editor.apply()
 
         Toast.makeText(this@MainActivity, "Data Saved", Toast.LENGTH_SHORT).show()
     }
+
+    //Helper function to store the taken profile photo
+    private fun saveImageToInternalStorage(bitmap: Bitmap): String {
+        val contextWrapper = ContextWrapper(applicationContext)
+        val directory = contextWrapper.getDir("imageDir", Context.MODE_PRIVATE)
+        val file = File(directory, "profile_image.jpg")
+
+        val stream: FileOutputStream
+        try {
+            stream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            stream.flush()
+            stream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return file.absolutePath
+    }
+
+    //Helper function to keep updated profile photo before a save is made
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Save the image path to the bundle
+        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+        val imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap())
+        outState.putString("image_path", imagePath)
+    }
 }
+
+
