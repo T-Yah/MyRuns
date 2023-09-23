@@ -6,6 +6,7 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -28,8 +29,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-//        setSupportActionBar(toolbar)
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        toolbar.setTitle("MyRun1")
+        toolbar.setTitleTextColor(Color.WHITE);
 
         //for testing shared preferences: clear save data
 //        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
@@ -300,7 +303,7 @@ class MainActivity : AppCompatActivity() {
         return file.absolutePath
     }
 
-    //Helper function to keep updated profile photo before a save is made in a roatation
+    //Helper function to keep updated profile photo before a save is made in case of a roatation
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         // Save the image path to the bundle

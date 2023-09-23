@@ -6,17 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <include
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        layout = "@layout/toolbar"
-        app:layout_constraintStart_toEndOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="409dp"
-        android:layout_height="729dp"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.483"
@@ -33,19 +38,26 @@
                 android:id="@+id/textView8"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="70dp"
+                android:layout_marginRight="12dp"
                 android:text="Profile Photo:"
-                android:textSize="16sp" />
+                android:textSize="20sp" />
 
             <ImageView
                 android:id="@+id/profilePhoto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:src="@drawable/ic_launcher_foreground" />
 
             <Button
                 android:id="@+id/changePfpBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="12dp"
                 android:gravity="center"
                 android:text="Change" />
 
@@ -53,13 +65,19 @@
                 android:id="@+id/textView10"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="12dp"
                 android:text="Name:"
-                android:textSize="16sp" />
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/enterName"
                 android:layout_width="match_parent"
                 android:layout_height="57dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="12dp"
                 android:ems="10"
                 android:hint="Your Name Here"
                 android:inputType="text" />
@@ -68,13 +86,19 @@
                 android:id="@+id/textView11"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="12dp"
                 android:text="Email:"
-                android:textSize="16sp" />
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/enterEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="12dp"
                 android:ems="10"
                 android:hint="Your Email Here"
                 android:inputType="textEmailAddress"
@@ -84,13 +108,19 @@
                 android:id="@+id/textView12"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="12dp"
                 android:text="Phone:"
-                android:textSize="16sp" />
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/enterPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="12dp"
                 android:ems="10"
                 android:hint="Your Phone Number Here"
                 android:inputType="phone"
@@ -99,20 +129,27 @@
             <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="12dp"
                 android:orientation="horizontal">
 
                 <RadioButton
                     android:id="@+id/femaleRadioBtn"
                     android:layout_width="200dp"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
                     android:text="Female"
+                    android:layout_gravity="center"
                     android:textSize="16sp" />
 
                 <RadioButton
                     android:id="@+id/maleRadioBtn"
                     android:layout_width="202dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
                     android:text="Male"
+                    android:layout_gravity="center"
                     android:textSize="16sp" />
 
             </RadioGroup>
@@ -121,14 +158,19 @@
                 android:id="@+id/textView13"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="12dp"
                 android:layout_weight="1"
                 android:text="Class:"
-                android:textSize="16sp" />
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/enterClass"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
                 android:ems="10"
                 android:hint="e.g 2012"
                 android:inputType="number"
@@ -138,13 +180,18 @@
                 android:id="@+id/textView14"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="12dp"
                 android:text="Major:"
-                android:textSize="16sp" />
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/enterMajor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
                 android:ems="10"
                 android:hint="e.g Biology"
                 android:inputType="text"
@@ -154,6 +201,9 @@
                 android:id="@+id/saveBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="12dp"
                 android:baselineAligned="false"
                 android:text="Save" />
 
@@ -161,8 +211,18 @@
                 android:id="@+id/cancelBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
                 android:text="Cancel" />
 
+<!--            <androidx.appcompat.widget.Toolbar-->
+<!--                android:id="@+id/toolbar"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="?attr/actionBarSize"-->
+<!--                android:background="?attr/colorPrimary"-->
+<!--                android:elevation="4dp"-->
+<!--                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"-->
+<!--                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />-->
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
