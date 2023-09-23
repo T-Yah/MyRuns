@@ -184,10 +184,12 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 0) {
-            //store photo as a bitmap
-            val photo = data?.extras?.get("data") as Bitmap
-            photoImageView.setImageBitmap(photo)
+        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
+            // Check if the data Intent is not null
+            if (data != null) {
+                val photo = data.extras?.get("data") as Bitmap
+                photoImageView.setImageBitmap(photo)
+            }
         }
     }
 
@@ -241,14 +243,19 @@ class MainActivity : AppCompatActivity() {
         val majorField = findViewById<EditText>(R.id.enterMajor)
         val radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
         val radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
+        val email = emailField.text.toString()
 
         if(TextUtils.isEmpty(nameField.getText().toString())
             || TextUtils.isEmpty(emailField.getText().toString())
             ||TextUtils.isEmpty(phoneField.getText().toString())
             ||TextUtils.isEmpty(classField.getText().toString())
             ||TextUtils.isEmpty(majorField.getText().toString())
-            ||(radioF.isChecked == false && radioM.isChecked == false)) {
+            ||(radioF.isChecked == false && radioM.isChecked == false)){
             Toast.makeText(this@MainActivity, "All fields must be filled before saving.", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        else if(emailField.text.toString().contains("@") == false){
+            Toast.makeText(this@MainActivity, "Please enter a valid email", Toast.LENGTH_SHORT).show()
             return false
         }
         else{
