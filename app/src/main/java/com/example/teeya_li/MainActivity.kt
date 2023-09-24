@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        toolbar.setTitle("MyRun1")
         toolbar.setTitleTextColor(Color.WHITE);
 
         //for testing shared preferences: clear save data
