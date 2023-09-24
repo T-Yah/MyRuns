@@ -38,18 +38,18 @@ class MainActivity : AppCompatActivity() {
 //        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
 //        sharedPref.edit().clear().commit()
 
-        // Initialize the imagePickerLauncher
-        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
-                if (data != null) {
-                    val selectedImageUri = data.data
-                    if (selectedImageUri != null) {
-                        // Process the selected image URI here
-                    }
-                }
-            }
-        }
+        //Beginning logic for if user selected the gallery option
+//        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+//            if (result.resultCode == Activity.RESULT_OK) {
+//                val data = result.data
+//                if (data != null) {
+//                    val selectedImageUri = data.data
+//                    if (selectedImageUri != null) {
+//                        // Process the selected image URI here
+//                    }
+//                }
+//            }
+//        }
 
         //Restore the image path in onCreate in case of a screen rotate
         if (savedInstanceState != null) {
@@ -196,6 +196,7 @@ class MainActivity : AppCompatActivity() {
 
     //ref: https://www.javatpoint.com/kotlin-android-alertdialog#:~:text=Builder%20class%20call%20the%20setTitle,neutral%20and%20negative%20action%20respectively.
     //Function to check if user actually wants to do the cancel option
+    //not used
     private fun cancelCheck(){
         finishAffinity()
         //Make sure user wants to clear with alert dialog
@@ -216,6 +217,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //Function to preform the cancel option, will clear all displayed input
+    //not used
     private fun cancelAction(){
         //Grab Objects on Page
         val nameField = findViewById<EditText>(R.id.enterName)
@@ -256,7 +258,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, "All fields must be filled before saving.", Toast.LENGTH_SHORT).show()
             return false
         }
-        else if(emailField.text.toString().contains("@") == false){
+        else if(emailField.text.toString().contains("@") == false || emailField.text.toString().contains(".") == false){
             Toast.makeText(this@MainActivity, "Please enter a valid email", Toast.LENGTH_SHORT).show()
             return false
         }
