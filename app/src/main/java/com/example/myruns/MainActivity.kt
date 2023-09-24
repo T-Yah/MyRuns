@@ -69,7 +69,8 @@ class MainActivity : AppCompatActivity() {
         //On Click Listeners for Buttons
         val cancelBtn = findViewById<Button>(R.id.cancelBtn)
         cancelBtn.setOnClickListener{
-            cancelCheck()
+            finishAffinity()
+            //cancelCheck() //implimented incorrect functionality
         }
         val saveBtn = findViewById<Button>(R.id.saveBtn)
         saveBtn.setOnClickListener{
@@ -196,6 +197,7 @@ class MainActivity : AppCompatActivity() {
     //ref: https://www.javatpoint.com/kotlin-android-alertdialog#:~:text=Builder%20class%20call%20the%20setTitle,neutral%20and%20negative%20action%20respectively.
     //Function to check if user actually wants to do the cancel option
     private fun cancelCheck(){
+        finishAffinity()
         //Make sure user wants to clear with alert dialog
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Clear Inputted Data")
