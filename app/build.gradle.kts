@@ -8,7 +8,7 @@ android {
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.example.myruns"
+        applicationId = "com.example.teeya_li"
         minSdk = 24
         targetSdk = 33
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.teeya_li
 
 import android.app.Activity
 import android.content.Context
@@ -17,9 +17,9 @@ import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.drawable.toBitmap
+import com.example.myruns.R
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -198,7 +198,6 @@ class MainActivity : AppCompatActivity() {
     //Function to check if user actually wants to do the cancel option
     //not used
     private fun cancelCheck(){
-        finishAffinity()
         //Make sure user wants to clear with alert dialog
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Clear Inputted Data")

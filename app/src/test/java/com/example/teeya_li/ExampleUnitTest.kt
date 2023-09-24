@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.teeya_li
 
 import org.junit.Test
 
