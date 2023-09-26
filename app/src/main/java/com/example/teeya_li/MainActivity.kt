@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -17,6 +18,7 @@ import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.drawable.toBitmap
 import com.example.myruns.R
@@ -38,17 +40,24 @@ class MainActivity : AppCompatActivity() {
 //        sharedPref.edit().clear().commit()
 
         //Beginning logic for if user selected the gallery option
-//        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-//            if (result.resultCode == Activity.RESULT_OK) {
-//                val data = result.data
-//                if (data != null) {
-//                    val selectedImageUri = data.data
-//                    if (selectedImageUri != null) {
-//                        // Process the selected image URI here
-//                    }
-//                }
-//            }
-//        }
+        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                if (data != null) {
+                    val selectedImageUri = data.data
+                    if (selectedImageUri != null) {
+                        val galleryImage = findViewById<ImageView>(R.id.profilePhoto)
+
+                        // Load the selected image URI into a Bitmap
+                        val contentResolver = contentResolver
+                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
+
+                        // Set the Bitmap to the ImageView
+                        galleryImage.setImageBitmap(bitmap)
+                    }
+                }
+            }
+        }
 
         //Restore the image path in onCreate in case of a screen rotate
         if (savedInstanceState != null) {
