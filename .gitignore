@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+/app/src/main/java/com/example/teeya_li/kian.kt
+/app/src/main/java/com/example/teeya_li/Redo.kt

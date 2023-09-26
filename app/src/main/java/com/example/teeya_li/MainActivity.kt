@@ -7,7 +7,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.media.Image
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -27,6 +27,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
+
     private var imagePickerLauncher: ActivityResultLauncher<Intent>? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,9 +36,13 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         toolbar.setTitleTextColor(Color.WHITE);
 
+
+
         //for testing shared preferences: clear save data
 //        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
 //        sharedPref.edit().clear().commit()
+
+        loadProfile()
 
         //Beginning logic for if user selected the gallery option
         imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -60,19 +65,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         //Restore the image path in onCreate in case of a screen rotate
-        if (savedInstanceState != null) {
-            val imagePath = savedInstanceState.getString("image_path")
-            if (imagePath != null && imagePath.isNotEmpty()) {
-                val imageFile = File(imagePath)
-                if (imageFile.exists()) {
-                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
-                    val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
-                    photoImageView.setImageBitmap(imageBitmap)
-                }
-            }
-        }
 
-        loadProfile()
 
         //On Click Listeners for Buttons
         val cancelBtn = findViewById<Button>(R.id.cancelBtn)
@@ -88,8 +81,9 @@ class MainActivity : AppCompatActivity() {
         }
         val changeBtn = findViewById<Button>(R.id.changePfpBtn)
         changeBtn.setOnClickListener{
-            showDialog()
+            changePfpButton()
         }
+
     }
 
     //Function to check if there is a previous saved instance, if so --> load it in, if not --> create empty activity
@@ -147,11 +141,23 @@ class MainActivity : AppCompatActivity() {
                 radioM.isChecked = true
             }
         }
-        val imagePath = sharedPref.getString("image_path", "")
 
-        if (imagePath != null) {
-            if (imagePath?.isNotEmpty() == true) {
-                val imageFile = File(imagePath)
+        val TempImagePath = sharedPref.getString("temp_image_path", "")
+        val SaveImagePath = sharedPref.getString("save_image_path", "")
+
+
+        if (TempImagePath != null) {
+            if (TempImagePath?.isNotEmpty() == true) {
+                val imageFile = File(TempImagePath)
+                if (imageFile.exists()) {
+                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                    photoImageView.setImageBitmap(imageBitmap)
+                }
+            }
+        }
+        if (SaveImagePath != null) {
+            if (SaveImagePath?.isNotEmpty() == true) {
+                val imageFile = File(SaveImagePath)
                 if (imageFile.exists()) {
                     val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
                     photoImageView.setImageBitmap(imageBitmap)
@@ -161,7 +167,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //Function to display a selection dialog for profile photo change
-    private fun showDialog(){
+    private fun changePfpButton(){
 
         val options = arrayOf("Take from Camera", "Select from Gallery", "Cancel")
         val builder = AlertDialog.Builder(this)
@@ -198,53 +204,17 @@ class MainActivity : AppCompatActivity() {
             if (data != null) {
                 val photo = data.extras?.get("data") as Bitmap
                 photoImageView.setImageBitmap(photo)
+
+                val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
+                var editor = sharedPref.edit()
+                val imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap(), "temp_profile.png")
+                editor.putString("temp_image_path", imagePath)
+                editor.apply()
             }
         }
     }
 
-    //ref: https://www.javatpoint.com/kotlin-android-alertdialog#:~:text=Builder%20class%20call%20the%20setTitle,neutral%20and%20negative%20action%20respectively.
-    //Function to check if user actually wants to do the cancel option
-    //not used
-    private fun cancelCheck(){
-        //Make sure user wants to clear with alert dialog
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Clear Inputted Data")
-        builder.setMessage("This will clear all unsaved data. Do you wish to continue?")
-
-        builder.setPositiveButton("Yes"){dialogInterface, which ->
-            cancelAction() //on yes click
-        }
-        builder.setNegativeButton("No"){dialogInterface, which ->
-            //on no click do nothing
-        }
-        // Create the AlertDialog
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.setCancelable(false) //cannot click out, must select an option
-        alertDialog.show()
-    }
-
-    //Function to preform the cancel option, will clear all displayed input
-    //not used
-    private fun cancelAction(){
-        //Grab Objects on Page
-        val nameField = findViewById<EditText>(R.id.enterName)
-        val emailField = findViewById<EditText>(R.id.enterEmail)
-        val phoneField = findViewById<EditText>(R.id.enterPhone)
-        val classField = findViewById<EditText>(R.id.enterClass)
-        val majorField = findViewById<EditText>(R.id.enterMajor)
-        val radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
-        val radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
-
-        //Clear all fields
-        radioF.setChecked(false)
-        radioM.setChecked(false)
-        nameField.text.clear()
-        emailField.text.clear()
-        phoneField.text.clear()
-        classField.text.clear()
-        majorField.text.clear()
-    }
-    //Function to check if all fields contain data, if so it is saveable
+    //Function to check if all fields contain data, if so it is savable
     private fun ifSavable() : Boolean {
         //Grab Objects on Page
         val nameField = findViewById<EditText>(R.id.enterName)
@@ -283,9 +253,9 @@ class MainActivity : AppCompatActivity() {
         val majorField = findViewById<EditText>(R.id.enterMajor)
         val radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
         val radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
-        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
 
-        val imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap())
+        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+        val imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap(), "save_profile.png")
 
         val sharedPreference = getSharedPreferences("sharedPref", MODE_PRIVATE)
         var editor = sharedPreference.edit()
@@ -297,17 +267,18 @@ class MainActivity : AppCompatActivity() {
         editor.putString("major", majorField.getText().toString())
         editor.putBoolean("female", radioF.isChecked());
         editor.putBoolean("male", radioM.isChecked());
-        editor.putString("image_path", imagePath)
+        editor.putString("save_image_path", imagePath)
+        editor.putString("temp_image_path", null)
         editor.apply()
 
         Toast.makeText(this@MainActivity, "Data Saved", Toast.LENGTH_SHORT).show()
     }
 
     //Helper function to store the taken profile photo
-    private fun saveImageToInternalStorage(bitmap: Bitmap): String {
+    private fun saveImageToInternalStorage(bitmap: Bitmap, name: String): String {
         val contextWrapper = ContextWrapper(applicationContext)
         val directory = contextWrapper.getDir("imageDir", Context.MODE_PRIVATE)
-        val file = File(directory, "profile_image.jpg")
+        val file = File(directory, name)
 
         val stream: FileOutputStream
         try {
@@ -320,15 +291,4 @@ class MainActivity : AppCompatActivity() {
         }
         return file.absolutePath
     }
-
-    //Helper function to keep updated profile photo before a save is made in case of a roatation
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        // Save the image path to the bundle
-        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
-        val imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap())
-        outState.putString("image_path", imagePath)
-    }
 }
-
-
