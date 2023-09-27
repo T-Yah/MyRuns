@@ -1,5 +1,9 @@
 package com.example.teeya_li
 
+//gallery photo if saved
+// - will disappear on rotate
+//gallery photo if not saved
+// - will disappear on rotate
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -49,6 +53,19 @@ class MainActivity : AppCompatActivity() {
         //for testing shared preferences: clear save data
         //val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
         //sharedPref.edit().clear().commit()
+
+        //leave this block in
+        if (savedInstanceState != null) {
+            tempImagePath = sharedPref.getString("temp_image_path", "")
+            if (unSavedProfile && !tempImagePath.isNullOrEmpty()){
+                val imageFile = File(tempImagePath)
+                if (imageFile.exists()) {
+                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                    val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+                    photoImageView.setImageBitmap(imageBitmap)
+                }
+            }
+        }
 
         //Log.d("unSavedProfilePath", tempImagePath.toString())
 
@@ -228,7 +245,10 @@ class MainActivity : AppCompatActivity() {
 
                 val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
                 var editor = sharedPref.edit()
-                val imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap(), "temp_profile.png")
+                val imagePath = saveImageToInternalStorage(
+                    photoImageView.drawable.toBitmap(),
+                    "temp_profile.png"
+                )
                 tempImagePath = imagePath
 
                 editor.putString("temp_image_path", imagePath)
