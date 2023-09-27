@@ -30,9 +30,6 @@ class MainActivity : AppCompatActivity() {
 
     private var imagePickerLauncher: ActivityResultLauncher<Intent>? = null
     private var tempImagePath: String? = null
-    private var imagePath: String? = null
-    private val CAMERA = 0
-    private val GALLERY = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -42,7 +39,6 @@ class MainActivity : AppCompatActivity() {
 
         val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
         val unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
-
         Log.d("unSavedProfileCreate", unSavedProfile.toString())
 
 
@@ -50,31 +46,42 @@ class MainActivity : AppCompatActivity() {
         //val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
         //sharedPref.edit().clear().commit()
 
-        //Log.d("unSavedProfilePath", tempImagePath.toString())
-
+        if (savedInstanceState != null) {
+            tempImagePath = savedInstanceState.getString("tempImagePath")
+            // If tempImagePath is not null, load the temporary image
+            if (!tempImagePath.isNullOrEmpty()) {
+                val imageFile = File(tempImagePath)
+                if (imageFile.exists()) {
+                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                    val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+                    photoImageView.setImageBitmap(imageBitmap)
+                }
+            }
+        }
 
         loadProfile()
 
         //Beginning logic for if user selected the gallery option
-        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
-                if (data != null) {
-                    val selectedImageUri = data.data
-                    if (selectedImageUri != null) {
-                        val galleryImage = findViewById<ImageView>(R.id.profilePhoto)
+//        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+//            if (result.resultCode == Activity.RESULT_OK) {
+//                val data = result.data
+//                if (data != null) {
+//                    val selectedImageUri = data.data
+//                    if (selectedImageUri != null) {
+//                        val galleryImage = findViewById<ImageView>(R.id.profilePhoto)
+//
+//                        // Load the selected image URI into a Bitmap
+//                        val contentResolver = contentResolver
+//                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
+//
+//                        // Set the Bitmap to the ImageView
+//                        galleryImage.setImageBitmap(bitmap)
+//                    }
+//                }
+//            }
+//        }
 
-                        // Load the selected image URI into a Bitmap
-                        val contentResolver = contentResolver
-                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
-
-                        // Set the Bitmap to the ImageView
-                        galleryImage.setImageBitmap(bitmap)
-
-                    }
-                }
-            }
-        }
+        //Restore the image path in onCreate in case of a screen rotate
 
 
         //On Click Listeners for Buttons
@@ -154,7 +161,6 @@ class MainActivity : AppCompatActivity() {
 
         // Load the profile photo based on whether it's the temporary or saved image
         val unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
-        Log.d("unSavedProfileLOADING", unSavedProfile.toString())
         val imagePath: String?
 
         if (unSavedProfile) {
@@ -170,6 +176,33 @@ class MainActivity : AppCompatActivity() {
                 photoImageView.setImageBitmap(imageBitmap)
             }
         }
+
+//        val unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
+//        val tempImagePath = sharedPref.getString("temp_image_path", "")
+//        val saveImagePath = sharedPref.getString("save_image_path", "")
+//
+//        Log.d("unSavedProfileLoad", unSavedProfile.toString())
+//
+//        //we took a photo (not saved) and rotated the screen
+//        if (unSavedProfile == true){
+//            if (tempImagePath?.isNotEmpty() == true) {
+//                val imageFile = File(tempImagePath)
+//                if (imageFile.exists()) {
+//                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+//                    photoImageView.setImageBitmap(imageBitmap)
+//                }
+//            }
+//        }
+//        //upload the save pfp
+//        else if (unSavedProfile == false) {
+//            if (saveImagePath?.isNotEmpty() == true) {
+//                val imageFile = File(saveImagePath)
+//                if (imageFile.exists()) {
+//                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+//                    photoImageView.setImageBitmap(imageBitmap)
+//                }
+//            }
+//        }
     }
 
     //Function to display a selection dialog for profile photo change
@@ -181,16 +214,16 @@ class MainActivity : AppCompatActivity() {
 
         builder.setItems(options) { dialog, which ->
             when (which) {
-                CAMERA -> {
+                0 -> {
                     // Open the camera to take a photo
                     val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    startActivityForResult(takePictureIntent, CAMERA)
+                    startActivityForResult(takePictureIntent, 0)
 
                 }
-                GALLERY -> {
+                1 -> {
+                    // Open the gallery to choose a photo
                     val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     imagePickerLauncher?.launch(galleryIntent)
-                    //saveGalleryImage()
                 }
                 2 -> {
                     dialog.dismiss()
@@ -200,27 +233,12 @@ class MainActivity : AppCompatActivity() {
         builder.show()
     }
 
-    private fun saveGalleryImage(){
-        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
-        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
-        var editor = sharedPref.edit()
-        val imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap(), "temp_profile.png")
-        tempImagePath = imagePath
-
-        editor.putString("temp_image_path", imagePath)
-        editor.putBoolean("unsavedProfile", true)
-        editor.apply()
-        val unSavedProfile = sharedPref.getBoolean("unsavedProfile", true)
-        Log.d("unSavedProfileGallery", unSavedProfile.toString())
-        Log.d("unSavedProfilePath", tempImagePath.toString())
-    }
-
     //Helper function to place the profile image into the imageview after taking a new photo
     //ref: https://www.geeksforgeeks.org/how-to-open-camera-through-intent-and-display-captured-image-in-android/
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CAMERA && resultCode == Activity.RESULT_OK) {
+        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
             // Check if the data Intent is not null
             if (data != null) {
                 val photo = data.extras?.get("data") as Bitmap
@@ -236,29 +254,6 @@ class MainActivity : AppCompatActivity() {
                 editor.apply()
                 val unSavedProfile = sharedPref.getBoolean("unsavedProfile", true)
                 Log.d("unSavedProfileCamera", unSavedProfile.toString())
-            }
-        }
-        else if (requestCode == GALLERY && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                // Handle the case when an image is selected from the gallery
-                val selectedImageUri = data.data
-                if (selectedImageUri != null) {
-                    val contentResolver = contentResolver
-                    val bitmap =
-                        MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
-                    photoImageView.setImageBitmap(bitmap)
-
-                    val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
-                    val editor = sharedPref.edit()
-                    val imagePath = saveImageToInternalStorage(bitmap, "temp_profile.png")
-                    tempImagePath = imagePath
-
-                    editor.putString("temp_image_path", imagePath)
-                    editor.putBoolean("unsavedProfile", true)
-                    editor.apply()
-                    val unSavedProfile = sharedPref.getBoolean("unsavedProfile", true)
-                    Log.d("unSavedProfileGallery", unSavedProfile.toString())
-                }
             }
         }
     }
@@ -359,17 +354,6 @@ class MainActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
         val unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
 
-        if (isChangingConfigurations) {
-            // If the device configuration is changing, save the actual temporary image path
-            // This should have been set in the onActivityResult method
-            val editor = sharedPref.edit()
-            editor.putString("temp_image_path", tempImagePath)
-            editor.putBoolean("unsavedProfile", true)
-            editor.apply()
-            Log.d("unSavedProfileONSTOProtate", unSavedProfile.toString())
-            Log.d("unSavedProfilePath", tempImagePath.toString())
-        }
-
         // Check if the user is leaving the app with an unsaved profile
         if (!isChangingConfigurations && unSavedProfile) {
             // Clear the temporary information
@@ -377,8 +361,7 @@ class MainActivity : AppCompatActivity() {
                 .putString("temp_image_path", null)
                 .putBoolean("unsavedProfile", false)
                 .apply()
-            Log.d("unSavedProfileONSTOPquit", unSavedProfile.toString())
-            Log.d("unSavedProfilePath", tempImagePath.toString())
         }
     }
+
 }
