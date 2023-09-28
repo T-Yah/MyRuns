@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Teeya_Li_MyRuns1</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>
