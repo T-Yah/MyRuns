@@ -44,8 +44,8 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         toolbar.setTitleTextColor(Color.WHITE);
 
-        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
-        val unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
+        var sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
+        var unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
 
         Log.d("unSavedProfileCreate", unSavedProfile.toString())
 
@@ -58,32 +58,29 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState != null) {
             tempImagePath = sharedPref.getString("temp_image_path", "")
             if (unSavedProfile && !tempImagePath.isNullOrEmpty()){
-                val imageFile = File(tempImagePath)
+                var imageFile = File(tempImagePath)
                 if (imageFile.exists()) {
-                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
-                    val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+                    var imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                    var photoImageView = findViewById<ImageView>(R.id.profilePhoto)
                     photoImageView.setImageBitmap(imageBitmap)
                 }
             }
         }
-
-        //Log.d("unSavedProfilePath", tempImagePath.toString())
-
 
         loadProfile()
 
         //Beginning logic for if user selected the gallery option
         imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
+                var data = result.data
                 if (data != null) {
-                    val selectedImageUri = data.data
+                    var selectedImageUri = data.data
                     if (selectedImageUri != null) {
-                        val galleryImage = findViewById<ImageView>(R.id.profilePhoto)
+                        var galleryImage = findViewById<ImageView>(R.id.profilePhoto)
 
                         // Load the selected image URI into a Bitmap
-                        val contentResolver = contentResolver
-                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
+                        var contentResolver = contentResolver
+                        var bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
 
                         // Set the Bitmap to the ImageView
                         galleryImage.setImageBitmap(bitmap)
@@ -95,41 +92,39 @@ class MainActivity : AppCompatActivity() {
 
 
         //On Click Listeners for Buttons
-        val cancelBtn = findViewById<Button>(R.id.cancelBtn)
+        var cancelBtn = findViewById<Button>(R.id.cancelBtn)
         cancelBtn.setOnClickListener{
             finishAffinity()
-            //cancelCheck() //implimented incorrect functionality
         }
-        val saveBtn = findViewById<Button>(R.id.saveBtn)
+        var saveBtn = findViewById<Button>(R.id.saveBtn)
         saveBtn.setOnClickListener{
             if (ifSavable()){
                 saveProfile()
             }
         }
-        val changeBtn = findViewById<Button>(R.id.changePfpBtn)
+        var changeBtn = findViewById<Button>(R.id.changePfpBtn)
         changeBtn.setOnClickListener{
             changePfpButton()
         }
-
     }
 
     //Function to check if there is a previous saved instance, if so --> load it in, if not --> create empty activity
     private fun loadProfile() {
         // Grab Objects on Page
-        val nameField = findViewById<EditText>(R.id.enterName)
-        val emailField = findViewById<EditText>(R.id.enterEmail)
-        val phoneField = findViewById<EditText>(R.id.enterPhone)
-        val classField = findViewById<EditText>(R.id.enterClass)
-        val majorField = findViewById<EditText>(R.id.enterMajor)
-        val radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
-        val radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
-        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+        var nameField = findViewById<EditText>(R.id.enterName)
+        var emailField = findViewById<EditText>(R.id.enterEmail)
+        var phoneField = findViewById<EditText>(R.id.enterPhone)
+        var classField = findViewById<EditText>(R.id.enterClass)
+        var majorField = findViewById<EditText>(R.id.enterMajor)
+        var radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
+        var radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
+        var photoImageView = findViewById<ImageView>(R.id.profilePhoto)
 
         //reference the shared preferences object
-        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
+        var sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
 
         // Check if there is any previous data
-        val isFirstRun = sharedPref.getBoolean("isFirstRun", true)
+        var isFirstRun = sharedPref.getBoolean("isFirstRun", true)
 
         if (isFirstRun) { //if there is no previous data
 
@@ -147,13 +142,13 @@ class MainActivity : AppCompatActivity() {
         }
         else { //we have previous data, must load into fields
             // Retrieve data from SharedPreferences
-            val name = sharedPref.getString("name", "")
-            val email = sharedPref.getString("email", "")
-            val phone = sharedPref.getString("phone", "")
-            val className = sharedPref.getString("class", "")
-            val major = sharedPref.getString("major", "")
-            val genderF = sharedPref.getBoolean("female", false)
-            val genderM = sharedPref.getBoolean("male", false)
+            var name = sharedPref.getString("name", "")
+            var email = sharedPref.getString("email", "")
+            var phone = sharedPref.getString("phone", "")
+            var className = sharedPref.getString("class", "")
+            var major = sharedPref.getString("major", "")
+            var genderF = sharedPref.getBoolean("female", false)
+            var genderM = sharedPref.getBoolean("male", false)
 
             // Set the retrieved data in the fields
             nameField.setText(name)
@@ -170,9 +165,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Load the profile photo based on whether it's the temporary or saved image
-        val unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
+        var unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
         Log.d("unSavedProfileLOADING", unSavedProfile.toString())
-        val imagePath: String?
+        var imagePath: String?
 
         if (unSavedProfile) {
             imagePath = sharedPref.getString("temp_image_path", "")
@@ -181,9 +176,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (!imagePath.isNullOrEmpty()) {
-            val imageFile = File(imagePath)
+            var imageFile = File(imagePath)
             if (imageFile.exists()) {
-                val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                var imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
                 photoImageView.setImageBitmap(imageBitmap)
             }
         }
@@ -200,14 +195,14 @@ class MainActivity : AppCompatActivity() {
             when (which) {
                 CAMERA -> {
                     // Open the camera to take a photo
-                    val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    var takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                     startActivityForResult(takePictureIntent, CAMERA)
 
                 }
                 GALLERY -> {
-                    val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    var galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     imagePickerLauncher?.launch(galleryIntent)
-                    //saveGalleryImage()
+                    saveGalleryImage()
                 }
                 2 -> {
                     dialog.dismiss()
@@ -218,34 +213,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveGalleryImage(){
-        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
-        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
+        var photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+        var sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
         var editor = sharedPref.edit()
-        val imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap(), "temp_profile.png")
+        var imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap(), "temp_profile.png")
         tempImagePath = imagePath
 
         editor.putString("temp_image_path", imagePath)
         editor.putBoolean("unsavedProfile", true)
         editor.apply()
-        val unSavedProfile = sharedPref.getBoolean("unsavedProfile", true)
+        var unSavedProfile = sharedPref.getBoolean("unsavedProfile", true)
         Log.d("unSavedProfileGallery", unSavedProfile.toString())
-        Log.d("unSavedProfilePath", tempImagePath.toString())
     }
 
     //Helper function to place the profile image into the imageview after taking a new photo
     //ref: https://www.geeksforgeeks.org/how-to-open-camera-through-intent-and-display-captured-image-in-android/
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+        var photoImageView = findViewById<ImageView>(R.id.profilePhoto)
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CAMERA && resultCode == Activity.RESULT_OK) {
             // Check if the data Intent is not null
             if (data != null) {
-                val photo = data.extras?.get("data") as Bitmap
+                var photo = data.extras?.get("data") as Bitmap
                 photoImageView.setImageBitmap(photo)
 
-                val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
+                var sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
                 var editor = sharedPref.edit()
-                val imagePath = saveImageToInternalStorage(
+                var imagePath = saveImageToInternalStorage(
                     photoImageView.drawable.toBitmap(),
                     "temp_profile.png"
                 )
@@ -254,46 +248,47 @@ class MainActivity : AppCompatActivity() {
                 editor.putString("temp_image_path", imagePath)
                 editor.putBoolean("unsavedProfile", true)
                 editor.apply()
-                val unSavedProfile = sharedPref.getBoolean("unsavedProfile", true)
+                var unSavedProfile = sharedPref.getBoolean("unsavedProfile", true)
                 Log.d("unSavedProfileCamera", unSavedProfile.toString())
             }
         }
-        else if (requestCode == GALLERY && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                // Handle the case when an image is selected from the gallery
-                val selectedImageUri = data.data
-                if (selectedImageUri != null) {
-                    val contentResolver = contentResolver
-                    val bitmap =
-                        MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
-                    photoImageView.setImageBitmap(bitmap)
-
-                    val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
-                    val editor = sharedPref.edit()
-                    val imagePath = saveImageToInternalStorage(bitmap, "temp_profile.png")
-                    tempImagePath = imagePath
-
-                    editor.putString("temp_image_path", imagePath)
-                    editor.putBoolean("unsavedProfile", true)
-                    editor.apply()
-                    val unSavedProfile = sharedPref.getBoolean("unsavedProfile", true)
-                    Log.d("unSavedProfileGallery", unSavedProfile.toString())
-                }
-            }
-        }
+//        else if (requestCode == GALLERY && resultCode == Activity.RESULT_OK) {
+//            Log.d("entered", "null")
+//            if (data != null) {
+//                // Handle the case when an image is selected from the gallery
+//                val selectedImageUri = data.data
+//                if (selectedImageUri != null) {
+//                    val contentResolver = contentResolver
+//                    val bitmap =
+//                        MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
+//                    photoImageView.setImageBitmap(bitmap)
+//
+//                    val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
+//                    val editor = sharedPref.edit()
+//                    val imagePath = saveImageToInternalStorage(bitmap, "temp_profile.png")
+//                    tempImagePath = imagePath
+//
+//                    editor.putString("temp_image_path", imagePath)
+//                    editor.putBoolean("unsavedProfile", true)
+//                    editor.apply()
+//                    val unSavedProfile = sharedPref.getBoolean("unsavedProfile", true)
+//                    Log.d("unSavedProfileGallery", unSavedProfile.toString())
+//                }
+//            }
+//        }
     }
 
     //Function to check if all fields contain data, if so it is savable
     private fun ifSavable() : Boolean {
         //Grab Objects on Page
-        val nameField = findViewById<EditText>(R.id.enterName)
-        val emailField = findViewById<EditText>(R.id.enterEmail)
-        val phoneField = findViewById<EditText>(R.id.enterPhone)
-        val classField = findViewById<EditText>(R.id.enterClass)
-        val majorField = findViewById<EditText>(R.id.enterMajor)
-        val radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
-        val radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
-        val email = emailField.text.toString()
+        var nameField = findViewById<EditText>(R.id.enterName)
+        var emailField = findViewById<EditText>(R.id.enterEmail)
+        var phoneField = findViewById<EditText>(R.id.enterPhone)
+        var classField = findViewById<EditText>(R.id.enterClass)
+        var majorField = findViewById<EditText>(R.id.enterMajor)
+        var radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
+        var radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
+        var email = emailField.text.toString()
 
         if(TextUtils.isEmpty(nameField.getText().toString())
             || TextUtils.isEmpty(emailField.getText().toString())
@@ -315,18 +310,18 @@ class MainActivity : AppCompatActivity() {
     //Function to save inputted data into sharedprefernces
     private fun saveProfile(){
         //Grab Objects on Page
-        val nameField = findViewById<EditText>(R.id.enterName)
-        val emailField = findViewById<EditText>(R.id.enterEmail)
-        val phoneField = findViewById<EditText>(R.id.enterPhone)
-        val classField = findViewById<EditText>(R.id.enterClass)
-        val majorField = findViewById<EditText>(R.id.enterMajor)
-        val radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
-        val radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
+        var nameField = findViewById<EditText>(R.id.enterName)
+        var emailField = findViewById<EditText>(R.id.enterEmail)
+        var phoneField = findViewById<EditText>(R.id.enterPhone)
+        var classField = findViewById<EditText>(R.id.enterClass)
+        var majorField = findViewById<EditText>(R.id.enterMajor)
+        var radioF = findViewById<RadioButton>(R.id.femaleRadioBtn)
+        var radioM = findViewById<RadioButton>(R.id.maleRadioBtn)
 
-        val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
-        val imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap(), "save_profile.png")
+        var photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+        var imagePath = saveImageToInternalStorage(photoImageView.drawable.toBitmap(), "save_profile.png")
 
-        val sharedPreference = getSharedPreferences("sharedPref", MODE_PRIVATE)
+        var sharedPreference = getSharedPreferences("sharedPref", MODE_PRIVATE)
         var editor = sharedPreference.edit()
         //.getText().toString() changes from edittext to string
         editor.putString("name", nameField.getText().toString())
@@ -343,7 +338,7 @@ class MainActivity : AppCompatActivity() {
 
         tempImagePath = null
 
-        val unSavedProfile = sharedPreference.getBoolean("unsavedProfile", false)
+        var unSavedProfile = sharedPreference.getBoolean("unsavedProfile", false)
         Log.d("unSavedProfileSave", unSavedProfile.toString())
 
         Toast.makeText(this@MainActivity, "Data Saved", Toast.LENGTH_SHORT).show()
@@ -351,11 +346,11 @@ class MainActivity : AppCompatActivity() {
 
     //Helper function to store the taken profile photo
     private fun saveImageToInternalStorage(bitmap: Bitmap, name: String): String {
-        val contextWrapper = ContextWrapper(applicationContext)
-        val directory = contextWrapper.getDir("imageDir", Context.MODE_PRIVATE)
-        val file = File(directory, name)
+        var contextWrapper = ContextWrapper(applicationContext)
+        var directory = contextWrapper.getDir("imageDir", Context.MODE_PRIVATE)
+        var file = File(directory, name)
 
-        val stream: FileOutputStream
+        var stream: FileOutputStream
         try {
             stream = FileOutputStream(file)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
@@ -376,13 +371,13 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
 
-        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
-        val unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
+        var sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
+        var unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
 
         if (isChangingConfigurations) {
             // If the device configuration is changing, save the actual temporary image path
             // This should have been set in the onActivityResult method
-            val editor = sharedPref.edit()
+            var editor = sharedPref.edit()
             editor.putString("temp_image_path", tempImagePath)
             editor.putBoolean("unsavedProfile", true)
             editor.apply()
