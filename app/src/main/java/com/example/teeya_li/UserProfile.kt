@@ -3,7 +3,7 @@ package com.example.teeya_li
 //gallery photo if saved
 // - will disappear on rotate
 //gallery photo if not saved
-// - will disappear on rotate
+// - will disappear on rotate FIX
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -30,7 +30,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
-class MainActivity : AppCompatActivity() {
+class UserProfile : AppCompatActivity() {
 
     private var imagePickerLauncher: ActivityResultLauncher<Intent>? = null
     private var tempImagePath: String? = null
@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity() {
 
                         // Set the Bitmap to the ImageView
                         galleryImage.setImageBitmap(bitmap)
+                        saveGalleryImage()
 
                     }
                 }
@@ -202,7 +203,8 @@ class MainActivity : AppCompatActivity() {
                 GALLERY -> {
                     var galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     imagePickerLauncher?.launch(galleryIntent)
-                    saveGalleryImage()
+
+                    //saveGalleryImage()
                 }
                 2 -> {
                     dialog.dismiss()
@@ -296,11 +298,11 @@ class MainActivity : AppCompatActivity() {
             ||TextUtils.isEmpty(classField.getText().toString())
             ||TextUtils.isEmpty(majorField.getText().toString())
             ||(radioF.isChecked == false && radioM.isChecked == false)){
-            Toast.makeText(this@MainActivity, "All fields must be filled before saving.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@UserProfile, "All fields must be filled before saving.", Toast.LENGTH_SHORT).show()
             return false
         }
         else if(emailField.text.toString().contains("@") == false || emailField.text.toString().contains(".") == false){
-            Toast.makeText(this@MainActivity, "Please enter a valid email", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@UserProfile, "Please enter a valid email", Toast.LENGTH_SHORT).show()
             return false
         }
         else{
@@ -341,7 +343,7 @@ class MainActivity : AppCompatActivity() {
         var unSavedProfile = sharedPreference.getBoolean("unsavedProfile", false)
         Log.d("unSavedProfileSave", unSavedProfile.toString())
 
-        Toast.makeText(this@MainActivity, "Data Saved", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@UserProfile, "Data Saved", Toast.LENGTH_SHORT).show()
     }
 
     //Helper function to store the taken profile photo
