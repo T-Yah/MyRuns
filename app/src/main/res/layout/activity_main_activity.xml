@@ -6,10 +6,23 @@
     android:layout_height="match_parent"
     tools:context="com.example.teeya_li.MainActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
     <com.google.android.material.tabs.TabLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tabLayout">
+        android:id="@+id/tabLayout"
+        android:layout_below="@id/toolbar">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
@@ -30,6 +43,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/view_pager"
-        android:layout_below="@id/tabLayout"/>
+        android:layout_below="@id/tabLayout">
+
+    </androidx.viewpager2.widget.ViewPager2>
 
 </RelativeLayout>
