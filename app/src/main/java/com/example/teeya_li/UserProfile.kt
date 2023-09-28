@@ -376,9 +376,8 @@ class UserProfile : AppCompatActivity() {
         var sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
         var unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
 
-        if (isChangingConfigurations) {
-            // If the device configuration is changing, save the actual temporary image path
-            // This should have been set in the onActivityResult method
+        if (isChangingConfigurations && unSavedProfile) { //keep temp variables
+            // If the device configuration is changing with a temp image, save the actual temporary image path
             var editor = sharedPref.edit()
             editor.putString("temp_image_path", tempImagePath)
             editor.putBoolean("unsavedProfile", true)
@@ -387,8 +386,28 @@ class UserProfile : AppCompatActivity() {
             Log.d("unSavedProfilePath", tempImagePath.toString())
         }
 
+        else if (isChangingConfigurations && !unSavedProfile) { //rotate with saved data, clear temp
+            // Clear the temporary information
+            sharedPref.edit()
+                .putString("temp_image_path", null)
+                .putBoolean("unsavedProfile", false)
+                .apply()
+            Log.d("unSavedProfileONSTOPquit", unSavedProfile.toString())
+            Log.d("unSavedProfilePath", tempImagePath.toString())
+        }
+
         // Check if the user is leaving the app with an unsaved profile
-        if (!isChangingConfigurations && unSavedProfile) {
+        else if (!isChangingConfigurations && unSavedProfile) { // left with unsaved data, , clear anything temp
+            // Clear the temporary information
+            sharedPref.edit()
+                .putString("temp_image_path", null)
+                .putBoolean("unsavedProfile", false)
+                .apply()
+            Log.d("unSavedProfileONSTOPquit", unSavedProfile.toString())
+            Log.d("unSavedProfilePath", tempImagePath.toString())
+        }
+
+        else if (!isChangingConfigurations && !unSavedProfile) { //left with saved data, clear anything temp
             // Clear the temporary information
             sharedPref.edit()
                 .putString("temp_image_path", null)
