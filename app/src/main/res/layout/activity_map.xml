@@ -18,12 +18,4 @@
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text = "Settings"
-        android:layout_centerInParent="true"
-        android:textSize="32dp"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

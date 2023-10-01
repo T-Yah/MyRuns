@@ -13,11 +13,6 @@
         android:theme="@style/Theme.MyRuns"
         tools:targetApi="31">
         <activity
-            android:name="com.example.teeya_li.MapActivity"
-            android:exported="false"
-            android:label="@string/title_activity_map"
-            android:theme="@style/Theme.MyRuns" />
-        <activity
             android:name="com.example.teeya_li.MainActivity"
             android:exported="true"
             android:label="@string/title_activity_main"
