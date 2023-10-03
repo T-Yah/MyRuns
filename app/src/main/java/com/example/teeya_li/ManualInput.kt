@@ -4,16 +4,25 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.graphics.Color
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myruns.R
 import java.util.Calendar
 
 class ManualInput : AppCompatActivity() {
+    var durationInput = ""
+    var distanceInput = ""
+    var caloriesInput = ""
+    var heartRateInput = ""
+    var commentInput = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manual_input)
@@ -44,22 +53,158 @@ class ManualInput : AppCompatActivity() {
             }
             else if (position == 2 ){
                 //duration
+                setDuration()
             }
             else if (position == 3 ){
                 //distance
+                setDistance()
             }
             else if (position == 4 ){
                 //calories
+                setCalories()
             }
             else if (position == 5 ){
                 //heart rate
+                setHeartRate()
             }
             else if (position == 6 ){
                 //comment
+                setComment()
             }
             Toast.makeText(this, "Selected Option: $selectedOption", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun setComment() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Comment")
+
+        // Set up the input
+        val input = EditText(this)
+        // Specify the type of input expected; this, for example, sets the input as a password and will mask the text
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        builder.setView(input)
+
+        // Set up the buttons
+        builder.setPositiveButton("OK") { dialog, _ ->
+            val inputValue = input.text.toString()
+            if (inputValue.isNotEmpty()) {
+                commentInput = inputValue
+            }
+            Toast.makeText(this, "Comment: $commentInput", Toast.LENGTH_SHORT).show()
+        }
+
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
+    }
+
+    private fun setHeartRate() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Heart Rate")
+
+        // Set up the input
+        val input = EditText(this)
+        // Specify the type of input expected; this, for example, sets the input as a password and will mask the text
+        input.inputType = InputType.TYPE_CLASS_NUMBER
+        builder.setView(input)
+
+        // Set up the buttons
+        builder.setPositiveButton("OK") { dialog, _ ->
+            val inputValue = input.text.toString()
+            if (inputValue.isNotEmpty()) {
+                heartRateInput = inputValue
+            }
+            Toast.makeText(this, "Heart Rate: $heartRateInput", Toast.LENGTH_SHORT).show()
+        }
+
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
+    }
+
+    private fun setCalories() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Calories")
+
+        // Set up the input
+        val input = EditText(this)
+        // Specify the type of input expected; this, for example, sets the input as a password and will mask the text
+        input.inputType = InputType.TYPE_CLASS_NUMBER
+        builder.setView(input)
+
+        // Set up the buttons
+        builder.setPositiveButton("OK") { dialog, _ ->
+            val inputValue = input.text.toString()
+            if (inputValue.isNotEmpty()) {
+                caloriesInput = inputValue
+            }
+            Toast.makeText(this, "Calories: $caloriesInput", Toast.LENGTH_SHORT).show()
+        }
+
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
+    }
+
+    private fun setDistance() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Distance")
+
+        // Set up the input
+        val input = EditText(this)
+        // Specify the type of input expected; this, for example, sets the input as a password and will mask the text
+        input.inputType = InputType.TYPE_CLASS_NUMBER
+        builder.setView(input)
+
+        // Set up the buttons
+        builder.setPositiveButton("OK") { dialog, _ ->
+            val inputValue = input.text.toString()
+            if (inputValue.isNotEmpty()) {
+                distanceInput = inputValue
+            }
+            Toast.makeText(this, "Distance: $distanceInput", Toast.LENGTH_SHORT).show()
+        }
+
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
+    }
+
+    private fun setDuration() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Duration")
+
+        // Set up the input
+        val input = EditText(this)
+        // Specify the type of input expected; this, for example, sets the input as a password and will mask the text
+        input.inputType = InputType.TYPE_CLASS_NUMBER
+        builder.setView(input)
+
+        // Set up the buttons
+        builder.setPositiveButton("OK") { dialog, _ ->
+            val inputValue = input.text.toString()
+            if (inputValue.isNotEmpty()) {
+                durationInput = inputValue
+            }
+            Toast.makeText(this, "Duration: $durationInput", Toast.LENGTH_SHORT).show()
+        }
+
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
+    }
+
     private fun showTimePickerDialog() {
         val calendar = Calendar.getInstance() //get current date and time
         val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
