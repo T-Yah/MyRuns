@@ -41,7 +41,7 @@ class StartFragment : Fragment() {
             val selectedInputPosition = InputSpinner.selectedItemPosition
 
             if (selectedInputPosition == 0){
-                val intent = Intent(requireContext(), ManualInput::class.java) //launch map activity
+                val intent = Intent(requireContext(), ManualInput::class.java) //launch manual input activity
                 startActivity(intent)
             }
             else if (selectedInputPosition == 1 || selectedInputPosition == 2){ //if GPS or Automatic selected

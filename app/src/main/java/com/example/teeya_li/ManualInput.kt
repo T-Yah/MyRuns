@@ -5,7 +5,6 @@ import android.app.TimePickerDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ListView
@@ -15,6 +14,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myruns.R
 import java.util.Calendar
+
+//TODO: handle screen rotations
+//TODO: update title on toolbar
 
 class ManualInput : AppCompatActivity() {
     var durationInput = ""
@@ -83,6 +85,7 @@ class ManualInput : AppCompatActivity() {
         val input = EditText(this)
         // Specify the type of input expected; this, for example, sets the input as a password and will mask the text
         input.inputType = InputType.TYPE_CLASS_TEXT
+        input.hint = "How did it go? Notes here."
         builder.setView(input)
 
         // Set up the buttons
