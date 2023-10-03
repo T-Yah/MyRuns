@@ -1,9 +1,5 @@
 package com.example.teeya_li
 
-//gallery photo if saved
-// - will disappear on rotate
-//gallery photo if not saved
-// - will disappear on rotate FIX
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -42,7 +38,7 @@ class UserProfile : AppCompatActivity() {
         setContentView(R.layout.activity_user_profile)
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setTitleTextColor(Color.WHITE)
 
         var sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
         var unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)

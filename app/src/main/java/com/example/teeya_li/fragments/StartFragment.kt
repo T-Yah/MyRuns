@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import com.example.myruns.R
+import com.example.teeya_li.ManualInput
 import com.example.teeya_li.MapActivity
 
 class StartFragment : Fragment() {
@@ -37,22 +38,15 @@ class StartFragment : Fragment() {
 
         val startBtn = view.findViewById<Button>(R.id.startBtn)
         startBtn.setOnClickListener{
-            InputSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    if (position == 1 || position == 2){
-                        val intent: Intent = Intent(requireContext(), MapActivity::class.java)
-                        startActivity(intent)
-                    }
-                }
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    // This method is called when nothing is selected in the Spinner.
-                    // You can leave it empty if you don't need to perform any action.
-                }
+            val selectedInputPosition = InputSpinner.selectedItemPosition
+
+            if (selectedInputPosition == 0){
+                val intent = Intent(requireContext(), ManualInput::class.java) //launch map activity
+                startActivity(intent)
+            }
+            else if (selectedInputPosition == 1 || selectedInputPosition == 2){ //if GPS or Automatic selected
+                val intent = Intent(requireContext(), MapActivity::class.java) //launch map activity
+                startActivity(intent)
             }
         }
 
