@@ -20,11 +20,16 @@ import java.util.Calendar
 //TODO: update title on toolbar
 
 class ManualInput : AppCompatActivity() {
-    var durationInput = ""
-    var distanceInput = ""
-    var caloriesInput = ""
-    var heartRateInput = ""
-    var commentInput = ""
+    private var durationInput = ""
+    private var distanceInput = ""
+    private var caloriesInput = ""
+    private var heartRateInput = ""
+    private var commentInput = ""
+
+    private var isTimePickerDialogOpen = false
+    private var isDatePickerDialogOpen = false
+    private var selectedTimeTimestamp: Long = 0
+    private var selectedDateTimestamp: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,37 +47,58 @@ class ManualInput : AppCompatActivity() {
         // Set the adapter for the ListView
         optionsListView.adapter = adapter
 
+        savedInstanceState?.let {
+            isTimePickerDialogOpen = it.getBoolean("isTimePickerDialogOpen", false)
+            isDatePickerDialogOpen = it.getBoolean("isDatePickerDialogOpen", false)
+            selectedTimeTimestamp = it.getLong("selectedTimeTimestamp", 0)
+            selectedDateTimestamp = it.getLong("selectedDateTimestamp", 0)
+
+            // Re-display the dialogs if they were open
+            if (isTimePickerDialogOpen) {
+                showTimePickerDialog()
+            }
+            if (isDatePickerDialogOpen) {
+                showDatePickerDialog()
+            }
+        }
+
 
         // Optionally, you can set an item click listener to handle item clicks
         optionsListView.setOnItemClickListener { _, _, position, _ ->
             val selectedOption = options[position]
-            if (position == 0 ){
-                //date
-                showDatePickerDialog()
-            }
-            else if (position == 1 ){
-                //time
-                showTimePickerDialog()
-            }
-            else if (position == 2 ){
-                //duration
-                setDuration()
-            }
-            else if (position == 3 ){
-                //distance
-                setDistance()
-            }
-            else if (position == 4 ){
-                //calories
-                setCalories()
-            }
-            else if (position == 5 ){
-                //heart rate
-                setHeartRate()
-            }
-            else if (position == 6 ){
-                //comment
-                setComment()
+            when (position) {
+                0 -> {
+                    //date
+                    isDatePickerDialogOpen = true
+                    showDatePickerDialog()
+                    //isDatePickerDialogOpen = false
+                }
+                1 -> {
+                    //time
+                    isTimePickerDialogOpen = true
+                    showTimePickerDialog()
+                    //isTimePickerDialogOpen = false
+                }
+                2 -> {
+                    //duration
+                    setDuration()
+                }
+                3 -> {
+                    //distance
+                    setDistance()
+                }
+                4 -> {
+                    //calories
+                    setCalories()
+                }
+                5 -> {
+                    //heart rate
+                    setHeartRate()
+                }
+                6 -> {
+                    //comment
+                    setComment()
+                }
             }
             Toast.makeText(this, "Selected Option: $selectedOption", Toast.LENGTH_SHORT).show()
         }
@@ -233,14 +259,18 @@ class ManualInput : AppCompatActivity() {
                 selectedTime.set(Calendar.MINUTE, minute)
 
                 // Calculate the timestamp by converting hours and minutes to milliseconds, stored as a long, dunno if right
-                val timestamp = selectedTime.timeInMillis
-                Toast.makeText(this, "Selected Option: $timestamp", Toast.LENGTH_SHORT).show()
+               selectedTimeTimestamp = selectedTime.timeInMillis
+                Toast.makeText(this, "Selected Option: $selectedTimeTimestamp", Toast.LENGTH_SHORT).show()
 
             },
             hourOfDay,
             minute,
             false // 24-hour format
         )
+        timePickerDialog.setOnDismissListener {//dialog dismissed
+            isTimePickerDialogOpen = false
+        }
+
         timePickerDialog.show()
     }
 
@@ -257,13 +287,27 @@ class ManualInput : AppCompatActivity() {
                 selectedCalendar.set(year, monthOfYear, dayOfMonth)
 
                 // Calculate the timestamp by converting the selected date to milliseconds
-                val timestamp = selectedCalendar.timeInMillis
-                Toast.makeText(this, "Selected Option: $timestamp", Toast.LENGTH_SHORT).show()
+                selectedDateTimestamp = selectedCalendar.timeInMillis
+                Toast.makeText(this, "Selected Option: $selectedDateTimestamp", Toast.LENGTH_SHORT).show()
             },
             year,
             month,
             dayOfMonth
         )
+        datePickerDialog.setOnDismissListener {//dialog dismissed
+            isDatePickerDialogOpen = false
+        }
         datePickerDialog.show()
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        // Save the dialog states and selected timestamps in case of rotation
+        outState.putBoolean("isTimePickerDialogOpen", isTimePickerDialogOpen)
+        outState.putBoolean("isDatePickerDialogOpen", isDatePickerDialogOpen)
+        outState.putLong("selectedTimeTimestamp", selectedTimeTimestamp)
+        outState.putLong("selectedDateTimestamp", selectedDateTimestamp)
+    }
+
 }
