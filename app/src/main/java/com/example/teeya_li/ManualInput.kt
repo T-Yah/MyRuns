@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.Toast
@@ -74,6 +75,17 @@ class ManualInput : AppCompatActivity() {
                 setComment()
             }
             Toast.makeText(this, "Selected Option: $selectedOption", Toast.LENGTH_SHORT).show()
+        }
+
+        val saveBtn = findViewById<Button>(R.id.saveButton)
+        saveBtn.setOnClickListener{
+            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+        val cancelBtn = findViewById<Button>(R.id.cancelButton)
+        cancelBtn.setOnClickListener{
+            Toast.makeText(this, "Entry Discarded", Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
 
