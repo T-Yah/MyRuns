@@ -5,24 +5,15 @@ import android.app.TimePickerDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myruns.R
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
-
-//TODO: handle screen rotations
-//TODO: display correct date and time after a rotation
-//TODO: in horizontal make list scrollable and fix button layout
-//TODO: make alertdialogs close properly after rotation
 
 class ManualInput : AppCompatActivity() {
     private var durationInput = ""
@@ -39,11 +30,6 @@ class ManualInput : AppCompatActivity() {
 
     private var isTimePickerDialogOpen = false
     private var isDatePickerDialogOpen = false
-    private var selectedHour = 0
-    private var selectedMinute = 0
-    private var selectedYear = 0;
-    private var selectedMonth = 0
-    private var selectedDay = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +38,7 @@ class ManualInput : AppCompatActivity() {
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         toolbar.title = "Manual Input"
         setSupportActionBar(toolbar)
-        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setTitleTextColor(Color.WHITE)
 
         val optionsListView = findViewById<ListView>(R.id.optionsListView)
         // Create an array of the options
@@ -74,18 +60,11 @@ class ManualInput : AppCompatActivity() {
 
             // Re-display the dialogs if they were open during a rotation
             if (isTimePickerDialogOpen) {
-                selectedHour = it.getInt("selectedHour", 0)
-                selectedMinute = it.getInt("selectedMinute", 0)
-                reloadTimePickerDialog(selectedHour, selectedMinute)
+                showTimePickerDialog()
             }
             if (isDatePickerDialogOpen) {
-                selectedYear = it.getInt("selectedYear", 0)
-                selectedMonth = it.getInt("selectedMonth", 0)
-                selectedDay = it.getInt("selectedDay", 0)
-                Log.d("dateYear", selectedYear.toString())
-                Log.d("dateMonth", selectedMonth.toString())
-                Log.d("dateDate", selectedDay.toString())
-                reloadDatePickerDialog(selectedYear, selectedMonth, selectedDay)
+                showDatePickerDialog()
+
             }
             if (isDurationOpen) {
                 setDuration()
@@ -162,7 +141,7 @@ class ManualInput : AppCompatActivity() {
 
     private fun setComment() {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Comment")
+        builder.setTitle("Comments")
 
         // Set up the input
         val input = EditText(this)
@@ -171,13 +150,14 @@ class ManualInput : AppCompatActivity() {
         input.hint = "How did it go? Notes here."
         builder.setView(input)
 
-        // Set up the buttons
         builder.setPositiveButton("OK") { dialog, _ ->
             val inputValue = input.text.toString()
             if (inputValue.isNotEmpty()) {
                 commentInput = inputValue
+                Toast.makeText(this, "Comment: $commentInput", Toast.LENGTH_SHORT).show()
             }
-            Toast.makeText(this, "Comment: $commentInput", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+            isCommentOpen = false
         }
 
         builder.setNegativeButton("Cancel") { dialog, _ ->
@@ -191,7 +171,7 @@ class ManualInput : AppCompatActivity() {
             isCommentOpen = false
         }
 
-        builder.show()
+        dialog.show()
     }
 
     private fun setHeartRate() {
@@ -204,31 +184,28 @@ class ManualInput : AppCompatActivity() {
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
 
-        // Set up the buttons
-        val dialog = builder.create()
         builder.setPositiveButton("OK") { dialog, _ ->
             val inputValue = input.text.toString()
             if (inputValue.isNotEmpty()) {
                 heartRateInput = inputValue
+                Toast.makeText(this, "Heart Rate: $heartRateInput", Toast.LENGTH_SHORT).show()
             }
-            Toast.makeText(this, "Heart Rate: $heartRateInput", Toast.LENGTH_SHORT).show()
-            isHeartRateOpen = false // Dialog is closed when OK is clicked
             dialog.dismiss()
+            isHeartRateOpen = false
         }
 
         builder.setNegativeButton("Cancel") { dialog, _ ->
-            isHeartRateOpen = false // Dialog is canceled
             dialog.cancel()
+            isHeartRateOpen = false
         }
 
-        // Set the dialog to be not cancelable by clicking outside of it
-        dialog.setCancelable(false)
+        val dialog = builder.create()
 
         dialog.setOnDismissListener {
-            isHeartRateOpen = false // Dialog is dismissed
+            isHeartRateOpen = false
         }
 
-        builder.show()
+        dialog.show()
     }
 
     private fun setCalories() {
@@ -241,33 +218,29 @@ class ManualInput : AppCompatActivity() {
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
 
-        // Set up the buttons
-        val dialog = builder.create()
         builder.setPositiveButton("OK") { dialog, _ ->
             val inputValue = input.text.toString()
             if (inputValue.isNotEmpty()) {
                 caloriesInput = inputValue
+                Toast.makeText(this, "Calories: $caloriesInput", Toast.LENGTH_SHORT).show()
             }
-            Toast.makeText(this, "Calories: $caloriesInput", Toast.LENGTH_SHORT).show()
-            isCaloriesOpen = false // Dialog is closed when OK is clicked
             dialog.dismiss()
+            isCaloriesOpen = false
         }
 
         builder.setNegativeButton("Cancel") { dialog, _ ->
-            isCaloriesOpen = false // Dialog is canceled
             dialog.cancel()
+            isCaloriesOpen = false
         }
 
-        // Set the dialog to be not cancelable by clicking outside of it
-        dialog.setCancelable(false)
+        val dialog = builder.create()
 
         dialog.setOnDismissListener {
-            isCaloriesOpen = false // Dialog is dismissed
+            isCaloriesOpen = false
         }
 
-        builder.show()
+        dialog.show()
     }
-
 
 
     private fun setDistance() {
@@ -280,17 +253,19 @@ class ManualInput : AppCompatActivity() {
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
 
-        // Set up the buttons
         builder.setPositiveButton("OK") { dialog, _ ->
             val inputValue = input.text.toString()
             if (inputValue.isNotEmpty()) {
                 distanceInput = inputValue
+                Toast.makeText(this, "Distance: $distanceInput", Toast.LENGTH_SHORT).show()
             }
-            Toast.makeText(this, "Distance: $distanceInput", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+            isDistanceOpen = false
         }
 
         builder.setNegativeButton("Cancel") { dialog, _ ->
             dialog.cancel()
+            isDistanceOpen = false
         }
 
         val dialog = builder.create()
@@ -299,7 +274,7 @@ class ManualInput : AppCompatActivity() {
             isDistanceOpen = false
         }
 
-        builder.show()
+        dialog.show()
     }
 
     private fun setDuration() {
@@ -312,17 +287,19 @@ class ManualInput : AppCompatActivity() {
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
 
-        // Set up the buttons
         builder.setPositiveButton("OK") { dialog, _ ->
             val inputValue = input.text.toString()
             if (inputValue.isNotEmpty()) {
                 durationInput = inputValue
+                Toast.makeText(this, "Duration: $durationInput", Toast.LENGTH_SHORT).show()
             }
-            Toast.makeText(this, "Duration: $durationInput", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+            isDurationOpen = false
         }
 
         builder.setNegativeButton("Cancel") { dialog, _ ->
             dialog.cancel()
+            isDurationOpen = false
         }
 
         val dialog = builder.create()
@@ -331,62 +308,7 @@ class ManualInput : AppCompatActivity() {
             isDurationOpen = false
         }
 
-        builder.show()
-    }
-
-    private fun reloadTimePickerDialog(hourOfDay: Int, minute: Int) {
-        val timePickerDialog = TimePickerDialog(
-            this,
-            TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-                val selectedTime = Calendar.getInstance()
-                selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                selectedTime.set(Calendar.MINUTE, minute)
-
-                // Save the selected time
-                this.selectedHour = hourOfDay
-                this.selectedMinute = minute
-
-                // Calculate the timestamp by converting hours and minutes to milliseconds
-                val timestamp = selectedTime.timeInMillis
-                Toast.makeText(this, "Selected Option: $timestamp", Toast.LENGTH_SHORT).show()
-            },
-            hourOfDay,
-            minute,
-            false // 24-hour format
-        )
-        timePickerDialog.setOnDismissListener {
-            isTimePickerDialogOpen = false
-        }
-
-        timePickerDialog.show()
-    }
-
-    private fun reloadDatePickerDialog(year: Int, monthOfYear: Int, dayOfMonth: Int){
-        val datePickerDialog = DatePickerDialog(
-            this,
-            DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                val selectedCalendar = Calendar.getInstance()
-                selectedCalendar.set(year, monthOfYear, dayOfMonth)
-
-                this.selectedYear = year
-                this.selectedMonth = monthOfYear
-                this.selectedDay = dayOfMonth
-                Log.d("dateYearRM", selectedYear.toString())
-                Log.d("dateMonthRM", selectedMonth.toString())
-                Log.d("dateDateRM", selectedDay.toString())
-
-                // Calculate the timestamp by converting the selected date to milliseconds
-                val timestamp = selectedCalendar.timeInMillis
-                Toast.makeText(this, "Selected Option: $timestamp", Toast.LENGTH_SHORT).show()
-            },
-            year,
-            monthOfYear,
-            dayOfMonth
-        )
-        datePickerDialog.setOnDismissListener {//dialog dismissed
-            isDatePickerDialogOpen = false
-        }
-        datePickerDialog.show()
+        dialog.show()
     }
 
     private fun showTimePickerDialog() {
@@ -401,13 +323,9 @@ class ManualInput : AppCompatActivity() {
                 selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 selectedTime.set(Calendar.MINUTE, minute)
 
-                // Save the selected time
-                this.selectedHour = hourOfDay
-                this.selectedMinute = minute
-
                 // Calculate the timestamp by converting hours and minutes to milliseconds, stored as a long, dunno if right
-               val timestamp = selectedTime.timeInMillis
-                Toast.makeText(this, "Selected Option: $timestamp", Toast.LENGTH_SHORT).show()
+//               val timestamp = selectedTime.timeInMillis
+//                Toast.makeText(this, "Selected Option: $timestamp", Toast.LENGTH_SHORT).show()
 
             },
             hourOfDay,
@@ -433,16 +351,9 @@ class ManualInput : AppCompatActivity() {
                 val selectedCalendar = Calendar.getInstance()
                 selectedCalendar.set(year, monthOfYear, dayOfMonth)
 
-                this.selectedYear = year
-                this.selectedMonth = monthOfYear
-                this.selectedDay = dayOfMonth
-                Log.d("dateYearOG", selectedYear.toString())
-                Log.d("dateMonthOG", selectedMonth.toString())
-                Log.d("dateDateOG", selectedDay.toString())
-
                 // Calculate the timestamp by converting the selected date to milliseconds
-                val timestamp = selectedCalendar.timeInMillis
-                Toast.makeText(this, "Selected Option: $timestamp", Toast.LENGTH_SHORT).show()
+//                val timestamp = selectedCalendar.timeInMillis
+//                Toast.makeText(this, "Selected Option: $timestamp", Toast.LENGTH_SHORT).show()
             },
             year,
             month,
@@ -460,11 +371,6 @@ class ManualInput : AppCompatActivity() {
         // Save the dialog states and selected timestamps in case of rotation
         outState.putBoolean("isTimePickerDialogOpen", isTimePickerDialogOpen)
         outState.putBoolean("isDatePickerDialogOpen", isDatePickerDialogOpen)
-        outState.putInt("selectedHour", selectedHour)
-        outState.putInt("selectedMinute", selectedMinute)
-        outState.putInt("selectedYear", selectedYear)
-        outState.putInt("selectedMonth", selectedMonth)
-        outState.putInt("selectedDay", selectedDay)
         outState.putBoolean("isDurationOpen", isDurationOpen)
         outState.putBoolean("isDistanceOpen", isDistanceOpen)
         outState.putBoolean("isCaloriesOpen", isCaloriesOpen)
