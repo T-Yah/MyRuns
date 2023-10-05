@@ -124,7 +124,6 @@ class ManualInput : AppCompatActivity() {
                     setComment()
                 }
             }
-            Toast.makeText(this, "Selected Option: $selectedOption", Toast.LENGTH_SHORT).show()
         }
 
         val saveBtn = findViewById<Button>(R.id.saveButton)
@@ -154,7 +153,6 @@ class ManualInput : AppCompatActivity() {
             val inputValue = input.text.toString()
             if (inputValue.isNotEmpty()) {
                 commentInput = inputValue
-                Toast.makeText(this, "Comment: $commentInput", Toast.LENGTH_SHORT).show()
             }
             dialog.dismiss()
             isCommentOpen = false
@@ -188,7 +186,6 @@ class ManualInput : AppCompatActivity() {
             val inputValue = input.text.toString()
             if (inputValue.isNotEmpty()) {
                 heartRateInput = inputValue
-                Toast.makeText(this, "Heart Rate: $heartRateInput", Toast.LENGTH_SHORT).show()
             }
             dialog.dismiss()
             isHeartRateOpen = false
@@ -222,7 +219,6 @@ class ManualInput : AppCompatActivity() {
             val inputValue = input.text.toString()
             if (inputValue.isNotEmpty()) {
                 caloriesInput = inputValue
-                Toast.makeText(this, "Calories: $caloriesInput", Toast.LENGTH_SHORT).show()
             }
             dialog.dismiss()
             isCaloriesOpen = false
@@ -257,7 +253,6 @@ class ManualInput : AppCompatActivity() {
             val inputValue = input.text.toString()
             if (inputValue.isNotEmpty()) {
                 distanceInput = inputValue
-                Toast.makeText(this, "Distance: $distanceInput", Toast.LENGTH_SHORT).show()
             }
             dialog.dismiss()
             isDistanceOpen = false
@@ -291,7 +286,6 @@ class ManualInput : AppCompatActivity() {
             val inputValue = input.text.toString()
             if (inputValue.isNotEmpty()) {
                 durationInput = inputValue
-                Toast.makeText(this, "Duration: $durationInput", Toast.LENGTH_SHORT).show()
             }
             dialog.dismiss()
             isDurationOpen = false

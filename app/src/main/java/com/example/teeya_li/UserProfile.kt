@@ -26,6 +26,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
+//TODO: titile
 class UserProfile : AppCompatActivity() {
 
     private var imagePickerLauncher: ActivityResultLauncher<Intent>? = null
@@ -39,6 +40,7 @@ class UserProfile : AppCompatActivity() {
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         toolbar.setTitleTextColor(Color.WHITE)
+        toolbar.title = "User Profile"
 
         var sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
         var unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)

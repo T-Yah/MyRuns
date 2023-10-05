@@ -13,13 +13,13 @@
 
     </PreferenceCategory>
     <PreferenceCategory android:title="Additional Settings">
-<!--        <ListPreference-->
-<!--            android:key="unitPreference"-->
-<!--            android:title="Unit Preference"-->
-<!--            android:summary="Select the units"-->
-<!--            android:entries="Metric|Imperial"-->
-<!--            android:entryValues="Kilometers|Miles"-->
-<!--            android:defaultValue="metric"/>-->
+        <ListPreference
+            android:key="unitPreference"
+            android:title="Unit Preference"
+            android:summary="Select the unit"
+            android:entries="@array/Measurments"
+            android:entryValues="@array/Measurments"
+            android:defaultValue="metric"/>
         <EditTextPreference
             android:key="comments"
             android:title="Comments"
@@ -30,6 +30,6 @@
         <Preference
             android:key="webpage"
             android:title="Webpage"
-            android:summary="http://sfu.ca/computing.html"/>
+            android:summary="http://www.sfu.ca/computing.html"/>
     </PreferenceCategory>
 </PreferenceScreen>

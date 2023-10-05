@@ -5,13 +5,6 @@
     tools:context="com.example.teeya_li.fragments.StartFragment">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text = "Start"
-        android:layout_centerInParent="true"
-        android:textSize="32dp"/>
-
-    <TextView
         android:id="@+id/textView"
         android:layout_width="91dp"
         android:layout_height="wrap_content"
