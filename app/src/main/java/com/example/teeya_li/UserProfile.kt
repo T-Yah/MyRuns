@@ -26,7 +26,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
-//TODO: titile
 class UserProfile : AppCompatActivity() {
 
     private var imagePickerLauncher: ActivityResultLauncher<Intent>? = null
@@ -42,8 +41,8 @@ class UserProfile : AppCompatActivity() {
         toolbar.setTitleTextColor(Color.WHITE)
         toolbar.title = "User Profile"
 
-        var sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
-        var unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
+        val sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE)
+        val unSavedProfile = sharedPref.getBoolean("unsavedProfile", false)
 
         Log.d("unSavedProfileCreate", unSavedProfile.toString())
 
@@ -56,10 +55,10 @@ class UserProfile : AppCompatActivity() {
         if (savedInstanceState != null) {
             tempImagePath = sharedPref.getString("temp_image_path", "")
             if (unSavedProfile && !tempImagePath.isNullOrEmpty()){
-                var imageFile = File(tempImagePath)
+                val imageFile = File(tempImagePath)
                 if (imageFile.exists()) {
-                    var imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
-                    var photoImageView = findViewById<ImageView>(R.id.profilePhoto)
+                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                    val photoImageView = findViewById<ImageView>(R.id.profilePhoto)
                     photoImageView.setImageBitmap(imageBitmap)
                 }
             }
@@ -72,7 +71,7 @@ class UserProfile : AppCompatActivity() {
             if (result.resultCode == Activity.RESULT_OK) {
                 var data = result.data
                 if (data != null) {
-                    var selectedImageUri = data.data
+                    val selectedImageUri = data.data
                     if (selectedImageUri != null) {
                         var galleryImage = findViewById<ImageView>(R.id.profilePhoto)
 
@@ -93,7 +92,7 @@ class UserProfile : AppCompatActivity() {
         //On Click Listeners for Buttons
         var cancelBtn = findViewById<Button>(R.id.cancelBtn)
         cancelBtn.setOnClickListener{
-            finishAffinity()
+            finish()
         }
         var saveBtn = findViewById<Button>(R.id.saveBtn)
         saveBtn.setOnClickListener{
