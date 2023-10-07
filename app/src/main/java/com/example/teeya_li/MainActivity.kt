@@ -13,6 +13,7 @@ import com.example.teeya_li.fragments.StartFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
+//Adapted from class material
 class MainActivity : AppCompatActivity() {
     private lateinit var viewPager2: ViewPager2
     private lateinit var tabLayout: TabLayout
