@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Teeya_Li_MyRuns1</string>
+    <string name="app_name">Teeya_Li_MyRuns</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_map">MapActivity</string>
     <string name="title_activity_manual_input">ManualInput</string>
