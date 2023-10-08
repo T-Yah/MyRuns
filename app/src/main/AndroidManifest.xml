@@ -20,7 +20,7 @@
         <activity
             android:name="com.example.teeya_li.MainActivity"
             android:exported="true"
-            android:label="@string/title_activity_main"
+            android:label="@string/app_name"
             android:theme="@style/Theme.MyRuns">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,11 +32,6 @@
             android:name="com.example.teeya_li.UserProfile"
             android:exported="true"
             android:label="User Profile">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.example.teeya_li.MapActivity"
