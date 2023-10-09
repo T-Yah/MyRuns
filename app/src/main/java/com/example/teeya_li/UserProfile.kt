@@ -98,6 +98,7 @@ class UserProfile : AppCompatActivity() {
         saveBtn.setOnClickListener{
             if (ifSavable()){
                 saveProfile()
+                finish()
             }
         }
         var changeBtn = findViewById<Button>(R.id.changePfpBtn)
