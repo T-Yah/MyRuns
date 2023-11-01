@@ -39,9 +39,11 @@ class StartFragment : Fragment() {
         val startBtn = view.findViewById<Button>(R.id.startBtn)
         startBtn.setOnClickListener{
             val selectedInputPosition = InputSpinner.selectedItemPosition
+            val selectedActivityPosition = ActivitySpinner.selectedItemPosition
 
             if (selectedInputPosition == 0){
                 val intent = Intent(requireContext(), ManualInput::class.java) //launch manual input activity
+                intent.putExtra("activity_position", selectedActivityPosition)
                 startActivity(intent)
             }
             else if (selectedInputPosition == 1 || selectedInputPosition == 2){ //if GPS or Automatic selected

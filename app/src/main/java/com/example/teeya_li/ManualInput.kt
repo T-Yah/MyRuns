@@ -12,7 +12,14 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.myruns.R
+import com.example.teeya_li.database.HistoryDatabase
+import com.example.teeya_li.database.HistoryDatabaseDao
+import com.example.teeya_li.database.HistoryEntry
+import com.example.teeya_li.database.HistoryRepository
+import com.example.teeya_li.database.HistoryViewModel
+import com.example.teeya_li.database.HistoryViewModelFactory
 import java.util.Calendar
 
 class ManualInput : AppCompatActivity() {
@@ -21,6 +28,9 @@ class ManualInput : AppCompatActivity() {
     private var caloriesInput = ""
     private var heartRateInput = ""
     private var commentInput = ""
+    private var selectedDate: Calendar? = null
+    private var selectedTime: Calendar? = null
+    private var combinedDateTime: Calendar? = null
 
     private var isDurationOpen = false
     private var isDistanceOpen = false
@@ -31,9 +41,25 @@ class ManualInput : AppCompatActivity() {
     private var isTimePickerDialogOpen = false
     private var isDatePickerDialogOpen = false
 
+    private lateinit var database: HistoryDatabase
+    private lateinit var databaseDao: HistoryDatabaseDao
+    private lateinit var repository: HistoryRepository
+    private lateinit var viewModelFactory: HistoryViewModelFactory
+    private lateinit var historyViewModel: HistoryViewModel
+    private var selectedActivityPosition: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manual_input)
+
+        selectedActivityPosition = intent.getIntExtra("activity_position", -1)
+
+        database = HistoryDatabase.getInstance(this)
+        databaseDao = database.historyDatabaseDao
+        repository = HistoryRepository(databaseDao)
+        viewModelFactory = HistoryViewModelFactory(repository)
+        historyViewModel = ViewModelProvider(this, viewModelFactory).get(
+            HistoryViewModel::class.java)
 
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         toolbar.title = "Manual Input"
@@ -42,7 +68,8 @@ class ManualInput : AppCompatActivity() {
 
         val optionsListView = findViewById<ListView>(R.id.optionsListView)
         // Create an array of the options
-        val options = arrayOf("Date", "Time", "Duration", "Distance", "Calories", "Heart Rate", "Comment")
+        val options =
+            arrayOf("Date", "Time", "Duration", "Distance", "Calories", "Heart Rate", "Comment")
         // Create an ArrayAdapter to populate the ListView
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, options)
         // Set the adapter for the ListView
@@ -90,34 +117,38 @@ class ManualInput : AppCompatActivity() {
                     //date
                     isDatePickerDialogOpen = true
                     showDatePickerDialog()
-                    //isDatePickerDialogOpen = false
                 }
+
                 1 -> {
                     //time
                     isTimePickerDialogOpen = true
                     showTimePickerDialog()
-                    //isTimePickerDialogOpen = false
                 }
+
                 2 -> {
                     //duration
                     isDurationOpen = true
                     setDuration()
                 }
+
                 3 -> {
                     //distance
                     isDistanceOpen = true
                     setDistance()
                 }
+
                 4 -> {
                     //calories
                     isCaloriesOpen = true
                     setCalories()
                 }
+
                 5 -> {
                     //heart rate
                     isHeartRateOpen = true
                     setHeartRate()
                 }
+
                 6 -> {
                     //comment
                     isCommentOpen = true
@@ -127,16 +158,64 @@ class ManualInput : AppCompatActivity() {
         }
 
         val saveBtn = findViewById<Button>(R.id.saveButton)
-        saveBtn.setOnClickListener{
-            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
-            finish()
+        saveBtn.setOnClickListener {
+            var res = checkValidity()
+            if (res == true){
+//                Log.d("ManualInput", "combinedDateTime: $combinedDateTime")
+//                Log.d("ManualInput", "durationInput: $durationInput")
+//                Log.d("ManualInput", "distanceInput: $distanceInput")
+//                Log.d("ManualInput", "caloriesInput: $caloriesInput")
+//                Log.d("ManualInput", "heartRateInput: $heartRateInput")
+//                Log.d("ManualInput", "commentInput: $commentInput")
+                val entry = HistoryEntry(
+                    // assuming you have an id generation mechanism in your DAO or entity
+                    dateTime = combinedDateTime,
+                    duration = durationInput?.toDoubleOrNull() ?: 0.0,
+                    distance = distanceInput?.toDoubleOrNull() ?: 0.0,
+                    calorie = caloriesInput?.toDoubleOrNull() ?: 0.0,
+                    heartRate = heartRateInput?.toDoubleOrNull() ?: 0.0,
+                    comment = commentInput ?: "",
+                    avgPace = 0.0,
+                    avgSpeed = 0.0,
+                    climb = 0.0,
+                    locationList = null,
+                    activityType = selectedActivityPosition,
+                    inputType = 0
+                )
+                historyViewModel.insert(entry)
+                Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
+
         val cancelBtn = findViewById<Button>(R.id.cancelButton)
         cancelBtn.setOnClickListener{
             Toast.makeText(this, "Entry Discarded", Toast.LENGTH_SHORT).show()
             finish()
         }
     }
+
+    private fun checkValidity(): Boolean {
+        // Check if all the inputs are valid
+        if (selectedDate != null && selectedTime != null && durationInput != null
+            && distanceInput != null && caloriesInput != null && heartRateInput != null && commentInput != null) {
+
+            val combinedDateTime = Calendar.getInstance()
+            combinedDateTime.timeInMillis = selectedDate!!.timeInMillis
+            combinedDateTime.set(Calendar.HOUR_OF_DAY, selectedTime!!.get(Calendar.HOUR_OF_DAY))
+            combinedDateTime.set(Calendar.MINUTE, selectedTime!!.get(Calendar.MINUTE))
+
+            this.combinedDateTime = combinedDateTime
+            Toast.makeText(this, "$combinedDateTime", Toast.LENGTH_SHORT).show()
+            return true
+
+        } else {
+            Toast.makeText(this, "Not all inputs are valid", Toast.LENGTH_SHORT).show()
+            return false
+        }
+    }
+
+
 
     private fun setComment() {
         val builder = AlertDialog.Builder(this)
@@ -238,7 +317,6 @@ class ManualInput : AppCompatActivity() {
         dialog.show()
     }
 
-
     private fun setDistance() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Distance")
@@ -306,27 +384,23 @@ class ManualInput : AppCompatActivity() {
     }
 
     private fun showTimePickerDialog() {
-        val calendar = Calendar.getInstance() //get current date and time
+        val calendar = Calendar.getInstance() // Get current date and time
         val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
 
         val timePickerDialog = TimePickerDialog(
             this,
             TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-                val selectedTime = Calendar.getInstance()
-                selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                selectedTime.set(Calendar.MINUTE, minute)
-
-                // Calculate the timestamp by converting hours and minutes to milliseconds, stored as a long, dunno if right
-//               val timestamp = selectedTime.timeInMillis
-//                Toast.makeText(this, "Selected Option: $timestamp", Toast.LENGTH_SHORT).show()
-
+                // When the user hits "OK," set the selected time to the chosen time
+                selectedTime = selectedTime ?: Calendar.getInstance()
+                selectedTime?.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                selectedTime?.set(Calendar.MINUTE, minute)
             },
             hourOfDay,
             minute,
             false // 24-hour format
         )
-        timePickerDialog.setOnDismissListener {//dialog dismissed
+        timePickerDialog.setOnDismissListener { // Dialog dismissed
             isTimePickerDialogOpen = false
         }
 
@@ -342,18 +416,15 @@ class ManualInput : AppCompatActivity() {
         val datePickerDialog = DatePickerDialog(
             this,
             DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                val selectedCalendar = Calendar.getInstance()
-                selectedCalendar.set(year, monthOfYear, dayOfMonth)
-
-                // Calculate the timestamp by converting the selected date to milliseconds
-//                val timestamp = selectedCalendar.timeInMillis
-//                Toast.makeText(this, "Selected Option: $timestamp", Toast.LENGTH_SHORT).show()
+                // When the user hits "OK," set the selected date to the chosen date
+                selectedDate = selectedDate ?: Calendar.getInstance()
+                selectedDate?.set(year, monthOfYear, dayOfMonth)
             },
             year,
             month,
             dayOfMonth
         )
-        datePickerDialog.setOnDismissListener {//dialog dismissed
+        datePickerDialog.setOnDismissListener { // dialog dismissed
             isDatePickerDialogOpen = false
         }
         datePickerDialog.show()
@@ -371,5 +442,4 @@ class ManualInput : AppCompatActivity() {
         outState.putBoolean("isHeartRateOpen", isHeartRateOpen)
         outState.putBoolean("isCommentOpen", isCommentOpen)
     }
-
 }
