@@ -36,6 +36,11 @@
         <activity
             android:name="com.example.teeya_li.MapActivity"
             android:label="Map"></activity>
+        <activity
+            android:name="com.example.teeya_li.HistoryDetails"
+            android:exported="true"
+            android:label="History Detail">
+        </activity>
     </application>
 
 </manifest>

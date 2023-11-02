@@ -1,20 +1,26 @@
 package com.example.teeya_li.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.myruns.R
+import com.example.teeya_li.HistoryDetails
 import com.example.teeya_li.database.HistoryDatabase
 import com.example.teeya_li.database.HistoryDatabaseDao
 import com.example.teeya_li.database.HistoryEntry
 import com.example.teeya_li.database.HistoryRepository
 import com.example.teeya_li.database.HistoryViewModel
 import com.example.teeya_li.database.HistoryViewModelFactory
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class HistoryFragment : Fragment() {
     private lateinit var database: HistoryDatabase
@@ -51,7 +57,39 @@ class HistoryFragment : Fragment() {
             arrayAdapter.notifyDataSetChanged()
         })
 
-        return view
+        list.setOnItemClickListener { _, _, position, _ ->
+            val selectedEntry = arrayAdapter.getItem(position) as HistoryEntry
+            val details: List<Pair<String, Any>> = listOfNotNull(
+                Pair("databaseID", selectedEntry.id),
+                Pair("Input Type", selectedEntry.inputType),
+                Pair("Activity Type", selectedEntry.activityType),
+                Pair(
+                    "Date and Time",
+                    SimpleDateFormat("HH:mm:ss MMM dd yyyy", Locale.getDefault()).format(
+                        selectedEntry.dateTime?.time ?: Date()
+                    )
+                ),
+                Pair("Duration", "${selectedEntry.duration} mins"),
+                Pair("Distance", "${selectedEntry.distance} Miles"),
+                Pair("Calories", "${selectedEntry.calorie} cals"),
+                Pair("Heart Rate", "${selectedEntry.heartRate} bpm"),
+                Pair("Comments", selectedEntry.comment)
+            )
+            val bundleList = ArrayList<Bundle>()
+            details.forEach {
+                val bundle = Bundle()
+                bundle.putString("key", it.first)
+                bundle.putString("value", it.second.toString())
+                bundleList.add(bundle)
+            }
+
+            val intent = Intent(requireContext(), HistoryDetails::class.java)
+            intent.putParcelableArrayListExtra("selectedEntry", bundleList)
+
+            startActivity(intent)
+        }
+
+            return view
     }
 
 }
