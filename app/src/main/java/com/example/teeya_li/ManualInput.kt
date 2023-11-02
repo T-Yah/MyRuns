@@ -32,12 +32,12 @@ class ManualInput : AppCompatActivity() {
     private var selectedTime: Calendar? = null
     private var combinedDateTime: Calendar? = null
 
+    //variables use to ensure desired behaviour on screen rotate
     private var isDurationOpen = false
     private var isDistanceOpen = false
     private var isCaloriesOpen = false
     private var isHeartRateOpen = false
     private var isCommentOpen = false
-
     private var isTimePickerDialogOpen = false
     private var isDatePickerDialogOpen = false
 
@@ -49,11 +49,20 @@ class ManualInput : AppCompatActivity() {
     private var selectedActivityPosition: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //define layout
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manual_input)
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        toolbar.title = "Manual Input"
+        setSupportActionBar(toolbar)
+        toolbar.setTitleTextColor(Color.WHITE)
 
+        //keep tabs on the selected activity type to be able to submit the activity type into the database
         selectedActivityPosition = intent.getIntExtra("activity_position", -1)
+        val options =
+            arrayOf("Date", "Time", "Duration", "Distance", "Calories", "Heart Rate", "Comment")
 
+        //define database objects
         database = HistoryDatabase.getInstance(this)
         databaseDao = database.historyDatabaseDao
         repository = HistoryRepository(databaseDao)
@@ -61,20 +70,12 @@ class ManualInput : AppCompatActivity() {
         historyViewModel = ViewModelProvider(this, viewModelFactory).get(
             HistoryViewModel::class.java)
 
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-        toolbar.title = "Manual Input"
-        setSupportActionBar(toolbar)
-        toolbar.setTitleTextColor(Color.WHITE)
-
+        //set up and populate the listview
         val optionsListView = findViewById<ListView>(R.id.optionsListView)
-        // Create an array of the options
-        val options =
-            arrayOf("Date", "Time", "Duration", "Distance", "Calories", "Heart Rate", "Comment")
-        // Create an ArrayAdapter to populate the ListView
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, options)
-        // Set the adapter for the ListView
         optionsListView.adapter = adapter
 
+        //if the screen was rotated, Re-display the dialogs if they were open during a rotation
         savedInstanceState?.let {
             isTimePickerDialogOpen = it.getBoolean("isTimePickerDialogOpen", false)
             isDatePickerDialogOpen = it.getBoolean("isDatePickerDialogOpen", false)
@@ -84,8 +85,6 @@ class ManualInput : AppCompatActivity() {
             isHeartRateOpen = it.getBoolean("isHeartRateOpen", false)
             isCommentOpen = it.getBoolean("isCommentOpen", false)
 
-
-            // Re-display the dialogs if they were open during a rotation
             if (isTimePickerDialogOpen) {
                 showTimePickerDialog()
             }
@@ -110,47 +109,41 @@ class ManualInput : AppCompatActivity() {
             }
         }
 
+        //if the user selects an item from the list, open the dialog for that section
         optionsListView.setOnItemClickListener { _, _, position, _ ->
             val selectedOption = options[position]
             when (position) {
                 0 -> {
-                    //date
                     isDatePickerDialogOpen = true
                     showDatePickerDialog()
                 }
 
                 1 -> {
-                    //time
                     isTimePickerDialogOpen = true
                     showTimePickerDialog()
                 }
 
                 2 -> {
-                    //duration
                     isDurationOpen = true
                     setDuration()
                 }
 
                 3 -> {
-                    //distance
                     isDistanceOpen = true
                     setDistance()
                 }
 
                 4 -> {
-                    //calories
                     isCaloriesOpen = true
                     setCalories()
                 }
 
                 5 -> {
-                    //heart rate
                     isHeartRateOpen = true
                     setHeartRate()
                 }
 
                 6 -> {
-                    //comment
                     isCommentOpen = true
                     setComment()
                 }
@@ -159,16 +152,10 @@ class ManualInput : AppCompatActivity() {
 
         val saveBtn = findViewById<Button>(R.id.saveButton)
         saveBtn.setOnClickListener {
-            var res = checkValidity()
+            var res = checkValidity() //make sure the entered values are save-able
             if (res == true){
-//                Log.d("ManualInput", "combinedDateTime: $combinedDateTime")
-//                Log.d("ManualInput", "durationInput: $durationInput")
-//                Log.d("ManualInput", "distanceInput: $distanceInput")
-//                Log.d("ManualInput", "caloriesInput: $caloriesInput")
-//                Log.d("ManualInput", "heartRateInput: $heartRateInput")
-//                Log.d("ManualInput", "commentInput: $commentInput")
                 val entry = HistoryEntry(
-                    // assuming you have an id generation mechanism in your DAO or entity
+                    //create a new history Entry
                     dateTime = combinedDateTime,
                     duration = durationInput?.toDoubleOrNull() ?: 0.0,
                     distance = distanceInput?.toDoubleOrNull() ?: 0.0,
@@ -221,9 +208,7 @@ class ManualInput : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Comments")
 
-        // Set up the input
         val input = EditText(this)
-        // Specify the type of input expected; this, for example, sets the input as a password and will mask the text
         input.inputType = InputType.TYPE_CLASS_TEXT
         input.hint = "How did it go? Notes here."
         builder.setView(input)
@@ -255,9 +240,7 @@ class ManualInput : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Heart Rate")
 
-        // Set up the input
         val input = EditText(this)
-        // Specify the type of input expected; this, for example, sets the input as a password and will mask the text
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
 
@@ -288,9 +271,7 @@ class ManualInput : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Calories")
 
-        // Set up the input
         val input = EditText(this)
-        // Specify the type of input expected; this, for example, sets the input as a password and will mask the text
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
 
@@ -321,9 +302,7 @@ class ManualInput : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Distance")
 
-        // Set up the input
         val input = EditText(this)
-        // Specify the type of input expected; this, for example, sets the input as a password and will mask the text
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
 
@@ -354,9 +333,7 @@ class ManualInput : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Duration")
 
-        // Set up the input
         val input = EditText(this)
-        // Specify the type of input expected; this, for example, sets the input as a password and will mask the text
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
 
@@ -384,7 +361,7 @@ class ManualInput : AppCompatActivity() {
     }
 
     private fun showTimePickerDialog() {
-        val calendar = Calendar.getInstance() // Get current date and time
+        val calendar = Calendar.getInstance()
         val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
 
@@ -400,7 +377,7 @@ class ManualInput : AppCompatActivity() {
             minute,
             false // 24-hour format
         )
-        timePickerDialog.setOnDismissListener { // Dialog dismissed
+        timePickerDialog.setOnDismissListener {
             isTimePickerDialogOpen = false
         }
 
@@ -424,7 +401,7 @@ class ManualInput : AppCompatActivity() {
             month,
             dayOfMonth
         )
-        datePickerDialog.setOnDismissListener { // dialog dismissed
+        datePickerDialog.setOnDismissListener {
             isDatePickerDialogOpen = false
         }
         datePickerDialog.show()

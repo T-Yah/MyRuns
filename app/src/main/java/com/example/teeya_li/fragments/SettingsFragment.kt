@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.example.myruns.R
@@ -32,6 +31,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
     }
+
+    //helper function to let the rest of the app know when the user selects a different unit preference
     fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         if (key == "unitPreference") {
             val unitPreference = sharedPreferences.getString("unitPreference", "metric")

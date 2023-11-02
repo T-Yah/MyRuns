@@ -9,7 +9,7 @@ class HistoryViewModel(private val repository: HistoryRepository) : ViewModel() 
     val allEntriesLiveData: LiveData<List<HistoryEntry>> = repository.allHistory.asLiveData()
 
     fun insert(entry: HistoryEntry) {
-        viewModelScope.launch {  // Using viewModelScope to avoid creating a new scope. It automatically cancels the coroutine when the ViewModel is destroyed.
+        viewModelScope.launch {
             repository.insert(entry)
         }
     }

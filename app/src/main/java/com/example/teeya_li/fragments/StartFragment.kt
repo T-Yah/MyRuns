@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
@@ -29,7 +28,7 @@ class StartFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_start, container, false)
 
-        // Initialize the spinner & set it up
+        // Initialize the spinners & set it up
         InputSpinner = view.findViewById(R.id.input_type_spinner)
         setInputSpinner()
 

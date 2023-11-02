@@ -47,25 +47,24 @@ class HistoryDetails : AppCompatActivity() {
 
     private var databaseID: Long = 0
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        //define layout
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history_detail)
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         toolbar.setTitle("MyRuns")
         toolbar.setTitleTextColor(Color.WHITE)
 
+        //grab information so we know whether to use km or miles
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         unitPreference = sharedPreferences.getString("unitPreference", "metric")
 
+        //define database objects
         database = HistoryDatabase.getInstance(this)
         databaseDao = database.historyDatabaseDao
         repository = HistoryRepository(databaseDao)
         viewModelFactory = HistoryViewModelFactory(repository)
         historyViewModel = ViewModelProvider(this, viewModelFactory).get(HistoryViewModel::class.java)
-
-        val delBtn = findViewById<ImageButton>(R.id.btnDelete)
-        delBtn.setOnClickListener {
-            deleteEntry()
-        }
 
         // Retrieve the values passed from the previous activity
         val selectedEntryExtras = intent.getParcelableArrayListExtra<Bundle>("selectedEntry")
@@ -74,7 +73,7 @@ class HistoryDetails : AppCompatActivity() {
             for (bundle in selectedEntryExtras) {
                 val key = bundle.getString("key")
                 val value = bundle.getString("value")
-                when (key) {
+                when (key) { //populate the activity elements with the passed information, format as needed
                     "databaseID" ->{
                         if (value != null) {
                             databaseID = value.toLong()
@@ -108,7 +107,15 @@ class HistoryDetails : AppCompatActivity() {
                 }
             }
         }
+
+        //delete functionality
+        val delBtn = findViewById<ImageButton>(R.id.btnDelete)
+        delBtn.setOnClickListener {
+            deleteEntry()
+        }
     }
+
+    //helper function to choose whether to display miles or km
     private fun getFormattedDistance(distance: Double, unitPreference: String?): String {
         return when (unitPreference) {
             "Metric (Kilometers)" -> "${distance} Kilometers"
@@ -116,6 +123,8 @@ class HistoryDetails : AppCompatActivity() {
             else -> "${distance} Kilometers" // Default to Kilometers
         }
     }
+
+    //function to delete the database entry
     private fun deleteEntry() {
         // Check if the `databaseID` is valid, and if it is, call the deleteEntry method in the ViewModel.
         if (databaseID != 0L) {

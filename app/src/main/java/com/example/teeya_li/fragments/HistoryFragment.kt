@@ -37,8 +37,9 @@ class HistoryFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_history, container, false)
-
         val list = view.findViewById<ListView>(R.id.list)
+
+        //declare database objects
         database = HistoryDatabase.getInstance(requireActivity())
         databaseDao = database.historyDatabaseDao
         repository = HistoryRepository(databaseDao)
@@ -46,6 +47,7 @@ class HistoryFragment : Fragment() {
         historyViewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(
             HistoryViewModel::class.java)
 
+        //populate listview
         arrayList = ArrayList()
         arrayAdapter = HistoryListAdapter(requireContext(), arrayList)
         list.adapter = arrayAdapter
@@ -56,6 +58,7 @@ class HistoryFragment : Fragment() {
             arrayAdapter.notifyDataSetChanged()
         })
 
+        //when list item clicked, send all the information to the next activity
         list.setOnItemClickListener { _, _, position, _ ->
             val selectedEntry = arrayAdapter.getItem(position) as HistoryEntry
             val details: List<Pair<String, Any>> = listOfNotNull(
@@ -87,7 +90,6 @@ class HistoryFragment : Fragment() {
 
             startActivity(intent)
         }
-
             return view
     }
 }
