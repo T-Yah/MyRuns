@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.myruns.R
@@ -70,7 +69,7 @@ class HistoryFragment : Fragment() {
                     )
                 ),
                 Pair("Duration", "${selectedEntry.duration} mins"),
-                Pair("Distance", "${selectedEntry.distance} Miles"),
+                Pair("Distance",  selectedEntry.distance),
                 Pair("Calories", "${selectedEntry.calorie} cals"),
                 Pair("Heart Rate", "${selectedEntry.heartRate} bpm"),
                 Pair("Comments", selectedEntry.comment)
@@ -91,5 +90,4 @@ class HistoryFragment : Fragment() {
 
             return view
     }
-
 }

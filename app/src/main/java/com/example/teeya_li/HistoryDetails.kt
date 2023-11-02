@@ -1,5 +1,6 @@
 package com.example.teeya_li
 
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.ImageButton
@@ -7,12 +8,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import com.example.myruns.R
 import com.example.teeya_li.database.HistoryDatabase
 import com.example.teeya_li.database.HistoryDatabaseDao
 import com.example.teeya_li.database.HistoryRepository
 import com.example.teeya_li.database.HistoryViewModel
 import com.example.teeya_li.database.HistoryViewModelFactory
+
 
 class HistoryDetails : AppCompatActivity() {
 
@@ -21,6 +24,9 @@ class HistoryDetails : AppCompatActivity() {
     private lateinit var repository: HistoryRepository
     private lateinit var viewModelFactory: HistoryViewModelFactory
     private lateinit var historyViewModel: HistoryViewModel
+
+    private lateinit var sharedPreferences: SharedPreferences
+    private var unitPreference: String? = "metric"
 
     private var activity_type_options = arrayOf(
         "Running",
@@ -47,6 +53,9 @@ class HistoryDetails : AppCompatActivity() {
         toolbar.setTitle("MyRuns")
         toolbar.setTitleTextColor(Color.WHITE)
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        unitPreference = sharedPreferences.getString("unitPreference", "metric")
+
         database = HistoryDatabase.getInstance(this)
         databaseDao = database.historyDatabaseDao
         repository = HistoryRepository(databaseDao)
@@ -69,7 +78,6 @@ class HistoryDetails : AppCompatActivity() {
                     "databaseID" ->{
                         if (value != null) {
                             databaseID = value.toLong()
-                            Toast.makeText(this, "$databaseID", Toast.LENGTH_SHORT).show()
                         }
                     }
                     "Input Type" -> {
@@ -90,24 +98,33 @@ class HistoryDetails : AppCompatActivity() {
 
                     "Date and Time" -> findViewById<TextView>(R.id.DateTimeTV).text = value
                     "Duration" -> findViewById<TextView>(R.id.DurationTV).text = value
-                    "Distance" -> findViewById<TextView>(R.id.DistanceTV).text = value
+                    "Distance" -> if (value != null) {
+                        val formattedDistance = getFormattedDistance(value.toDouble(), unitPreference)
+                        findViewById<TextView>(R.id.DistanceTV).text = formattedDistance
+                    }
+
                     "Calories" -> findViewById<TextView>(R.id.CaloriesTV).text = value
                     "Heart Rate" -> findViewById<TextView>(R.id.HeartRateTV).text = value
                 }
             }
         }
     }
-
+    private fun getFormattedDistance(distance: Double, unitPreference: String?): String {
+        return when (unitPreference) {
+            "Metric (Kilometers)" -> "${distance} Kilometers"
+            "Imperial (Miles)" -> "${distance} Miles"
+            else -> "${distance} Kilometers" // Default to Kilometers
+        }
+    }
     private fun deleteEntry() {
         // Check if the `databaseID` is valid, and if it is, call the deleteEntry method in the ViewModel.
-        Toast.makeText(this, "$databaseID", Toast.LENGTH_SHORT).show()
         if (databaseID != 0L) {
             val entryLiveData = historyViewModel.getEntryById(databaseID)
             entryLiveData.observe(this) { entry ->
                 if (entry != null) {
                     historyViewModel.deleteEntry(entry)
                     Toast.makeText(this, "Entry deleted successfully", Toast.LENGTH_SHORT).show()
-                    finish() // Close this activity after deleting the entry
+                    finish()
                 }
             }
         }

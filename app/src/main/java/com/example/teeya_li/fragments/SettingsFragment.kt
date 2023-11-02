@@ -1,19 +1,21 @@
 package com.example.teeya_li.fragments
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.example.myruns.R
 import com.example.teeya_li.UserProfile
+
 
 class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
 
         val userProfile: Preference? = findPreference("userProfile") as Preference?
-
         if (userProfile != null) { // on user Profile click launch user profile activity
             userProfile.setOnPreferenceClickListener {
                 val intent = Intent(activity, UserProfile::class.java)
@@ -28,6 +30,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 startActivity(intent)
                 true
             }
+        }
+    }
+    fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+        if (key == "unitPreference") {
+            val unitPreference = sharedPreferences.getString("unitPreference", "metric")
         }
     }
 }
