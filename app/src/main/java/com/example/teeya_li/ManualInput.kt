@@ -184,8 +184,8 @@ class ManualInput : AppCompatActivity() {
 
     private fun checkValidity(): Boolean {
         // Check if all the inputs are valid
-        if (selectedDate != null && selectedTime != null && durationInput != null
-            && distanceInput != null && caloriesInput != null && heartRateInput != null && commentInput != null) {
+        if (selectedDate != null && selectedTime != null && durationInput != ""
+            && distanceInput != "" && caloriesInput != "" && heartRateInput != "" && commentInput != "") {
 
             val combinedDateTime = Calendar.getInstance()
             combinedDateTime.timeInMillis = selectedDate!!.timeInMillis
@@ -193,7 +193,6 @@ class ManualInput : AppCompatActivity() {
             combinedDateTime.set(Calendar.MINUTE, selectedTime!!.get(Calendar.MINUTE))
 
             this.combinedDateTime = combinedDateTime
-            Toast.makeText(this, "$combinedDateTime", Toast.LENGTH_SHORT).show()
             return true
 
         } else {
@@ -212,6 +211,7 @@ class ManualInput : AppCompatActivity() {
         input.inputType = InputType.TYPE_CLASS_TEXT
         input.hint = "How did it go? Notes here."
         builder.setView(input)
+        input.setText(commentInput)
 
         builder.setPositiveButton("OK") { dialog, _ ->
             val inputValue = input.text.toString()
@@ -225,6 +225,8 @@ class ManualInput : AppCompatActivity() {
         builder.setNegativeButton("Cancel") { dialog, _ ->
             dialog.cancel()
             isCommentOpen = false
+            commentInput = ""
+            input.setText("")
         }
 
         val dialog = builder.create()
@@ -243,6 +245,7 @@ class ManualInput : AppCompatActivity() {
         val input = EditText(this)
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
+        input.setText(heartRateInput)
 
         builder.setPositiveButton("OK") { dialog, _ ->
             val inputValue = input.text.toString()
@@ -256,6 +259,8 @@ class ManualInput : AppCompatActivity() {
         builder.setNegativeButton("Cancel") { dialog, _ ->
             dialog.cancel()
             isHeartRateOpen = false
+            heartRateInput = ""
+            input.setText("")
         }
 
         val dialog = builder.create()
@@ -274,6 +279,7 @@ class ManualInput : AppCompatActivity() {
         val input = EditText(this)
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
+        input.setText(caloriesInput)
 
         builder.setPositiveButton("OK") { dialog, _ ->
             val inputValue = input.text.toString()
@@ -287,6 +293,8 @@ class ManualInput : AppCompatActivity() {
         builder.setNegativeButton("Cancel") { dialog, _ ->
             dialog.cancel()
             isCaloriesOpen = false
+            caloriesInput = ""
+            input.setText("")
         }
 
         val dialog = builder.create()
@@ -305,6 +313,7 @@ class ManualInput : AppCompatActivity() {
         val input = EditText(this)
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
+        input.setText(distanceInput)
 
         builder.setPositiveButton("OK") { dialog, _ ->
             val inputValue = input.text.toString()
@@ -318,6 +327,8 @@ class ManualInput : AppCompatActivity() {
         builder.setNegativeButton("Cancel") { dialog, _ ->
             dialog.cancel()
             isDistanceOpen = false
+            distanceInput = ""
+            input.setText("")
         }
 
         val dialog = builder.create()
@@ -336,6 +347,7 @@ class ManualInput : AppCompatActivity() {
         val input = EditText(this)
         input.inputType = InputType.TYPE_CLASS_NUMBER
         builder.setView(input)
+        input.setText(durationInput)
 
         builder.setPositiveButton("OK") { dialog, _ ->
             val inputValue = input.text.toString()
@@ -347,6 +359,8 @@ class ManualInput : AppCompatActivity() {
         }
 
         builder.setNegativeButton("Cancel") { dialog, _ ->
+            durationInput = ""
+            input.setText("")
             dialog.cancel()
             isDurationOpen = false
         }
