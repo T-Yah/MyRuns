@@ -15,6 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyRuns"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyARkiVtZhmqfsCzxyQT_CRHSaQC07isSkc" />
+
         <activity
             android:name="com.example.teeya_li.ManualInput"
             android:exported="false"
@@ -38,7 +43,8 @@
         </activity>
         <activity
             android:name="com.example.teeya_li.MapActivity"
-            android:label="Map"></activity>
+            android:label="Map">
+        </activity>
         <activity
             android:name="com.example.teeya_li.HistoryDetails"
             android:exported="true"
