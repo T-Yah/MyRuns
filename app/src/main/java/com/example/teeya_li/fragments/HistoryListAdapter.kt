@@ -43,9 +43,9 @@ class HistoryListAdapter(private val context: Context, private var historyList: 
         if (entryTypeValue == 0) {
             entryType.text = "Manual Entry"
         }
-//        if (entryTypeValue == 1){
-//            entryType.text = "Manual Entry"
-//        }
+        if (entryTypeValue == 1){
+            entryType.text = "GPS"
+        }
 //        if (entryTypeValue == 2){
 //            entryType.text = "GPS"
 //        }

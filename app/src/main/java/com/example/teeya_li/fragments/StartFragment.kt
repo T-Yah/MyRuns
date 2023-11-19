@@ -12,6 +12,7 @@ import android.widget.Spinner
 import com.example.myruns.R
 import com.example.teeya_li.ManualInput
 import com.example.teeya_li.MapActivity
+import com.example.teeya_li.service.TrackingService
 
 class StartFragment : Fragment() {
     private lateinit var InputSpinner: Spinner
@@ -46,8 +47,13 @@ class StartFragment : Fragment() {
                 startActivity(intent)
             }
             else if (selectedInputPosition == 1 || selectedInputPosition == 2){ //if GPS or Automatic selected
+                val serviceIntent = Intent(requireContext(), TrackingService::class.java)
+                requireContext().startService(serviceIntent)
+
                 val intent = Intent(requireContext(), MapActivity::class.java) //launch map activity
+                intent.putExtra("activity_position", selectedActivityPosition)
                 startActivity(intent)
+
             }
         }
 
