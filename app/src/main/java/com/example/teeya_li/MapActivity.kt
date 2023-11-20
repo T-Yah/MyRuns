@@ -81,6 +81,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener,
     private lateinit var historyViewModel: HistoryViewModel
 
     private lateinit var latlongList: ArrayList<LatLng>
+    private var lastLocation: LatLng? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,7 +129,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener,
             stopCounting()
             val intent = Intent()
             intent.action = TrackingService.SAVE_DATA_ACTION
-            intent.putExtra("activityType", activityPosition)
             sendBroadcast(intent)
             intent.action = TrackingService.STOP_SERVICE_ACTION
             sendBroadcast(intent)
@@ -137,6 +138,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener,
     }
 
     private fun saveToDatabase() {
+        println("debug: in save database function")
         val entry = HistoryEntry(
             //create a new history Entry
             dateTime = Calendar.getInstance(),
@@ -213,15 +215,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener,
     }
 
     override fun onLocationChanged(location: Location) {
-        println("debug: onlocationchanged() ${location.latitude} ${location.longitude}")
         val lat = location.latitude
         val lng = location.longitude
         val latLng = LatLng(lat, lng)
 
-        val intent = Intent(this, TrackingService::class.java)
-        intent.action = TrackingService.LOCATION_UPDATE_ACTION
-        intent.putExtra("latLng", latLng) // Pass latLng as an extra
-        startService(intent)
+//        if (lastLocation == null || latLng != lastLocation) {
+//            // Broadcast or use a callback to send location data to the service
+//            val intent = Intent(this, TrackingService::class.java)
+//            intent.action = TrackingService.LOCATION_UPDATE_ACTION
+//            intent.putExtra("latLng", latLng) // Pass latLng as an extra
+//            startService(intent)
+//
+//            // Save the current location as the last location
+//            lastLocation = latLng
+//        }
 
         if (!mapCentered) {
             val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)

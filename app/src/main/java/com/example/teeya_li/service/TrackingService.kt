@@ -65,8 +65,7 @@ class TrackingService : Service(), LocationListener {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val latLng: LatLng? = intent.getParcelableExtra("latLng")
         if (latLng != null) { //save the new latLng data from gps
-            locationList.add(latLng)
-            println("debug: service $latLng")
+            //locationList.add(latLng)
         }
 
         //update variables with the new lat/long info
@@ -141,7 +140,6 @@ class TrackingService : Service(), LocationListener {
         // Called when the status of the GPS provider changes
     }
     fun showNotification() {
-        println("debug: showNotification called")
         val mainActivityIntent = Intent(this, MainActivity::class.java)
         mainActivityIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
 
