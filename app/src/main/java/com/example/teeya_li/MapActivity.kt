@@ -126,6 +126,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener,
         }
         val saveBtn = findViewById<Button>(R.id.saveButton)
         saveBtn.setOnClickListener{
+            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
             stopCounting()
             val intent = Intent()
             intent.action = TrackingService.SAVE_DATA_ACTION
