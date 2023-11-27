@@ -84,5 +84,9 @@ dependencies {
     //map
     implementation("com.google.android.gms:play-services-maps:18.2.0")
 
+    //Weka
+    implementation("org.apache.commons:commons-math3:3.6.1")
+
+
 
 }

@@ -14,14 +14,18 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.os.Handler
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import android.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -40,10 +44,15 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import org.apache.commons.math3.transform.FastFourierTransformer
+import org.apache.commons.math3.transform.TransformType
 import java.util.Calendar
+import java.util.LinkedList
+import org.apache.commons.math3.transform.DftNormalization
+
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener,
-    GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
+    GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, SensorEventListener {
     private var activity_type_options = arrayOf("Running", "Walking", "Standing", "Cycling", "Hiking", "Downhill Skiing",
         "Cross-Country Skiing", "Snowboarding", "Skating", "Swimming", "Mountain Biking", "Wheelchair", "Elliptical",
         "Other")
@@ -83,6 +92,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener,
     private lateinit var latlongList: ArrayList<LatLng>
     private var lastLocation: LatLng? = null
 
+    private var launchType = 0 //to determine behaviour
+
+    // to hold the readings from the sensor which will be in a double if user selected automatic
+    private var x: Double = 0.0
+    private var y: Double = 0.0
+    private var z: Double = 0.0
+    // for time checking
+    private var lastTime: Long = 0
+    private var currentTime: Long =0
+    private lateinit var sensorManager: SensorManager
+
+    //for weka
+    private val accelerometerQueue: LinkedList<FloatArray> = LinkedList()
+    private val FEATURE_VECTOR_SIZE = 64
+    private val wekaClassifier = WekaClassifier()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,11 +136,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         unitPreference = sharedPreferences.getString("unitPreference", "metric").toString()
 
+        //Determine if it was gps or automatic that launched the activity
+        launchType = intent.getIntExtra("gpsOrAuto", -1)
+
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+
+
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map)
                 as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         startCounting()
+
+        if (launchType == 2){ //if the user selected automatic mode
+            lastTime = System.currentTimeMillis() //get time when app opens
+
+        }
 
         var cancelBtn = findViewById<Button>(R.id.cancelButton)
         cancelBtn.setOnClickListener{
@@ -156,7 +192,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener,
             inputType = 1
         )
         historyViewModel.insert(entry)
-
     }
 
     private fun startCounting() {
@@ -310,17 +345,104 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener,
             }
         }
     }
+    private fun generateFeatureVector(): DoubleArray {
+        // Initialize arrays for FFT
+        val re = DoubleArray(FEATURE_VECTOR_SIZE)
+        val im = DoubleArray(FEATURE_VECTOR_SIZE)
+
+        // Copy the accelerometer readings from the queue to re array
+        for (i in accelerometerQueue.indices) {
+            val reading = accelerometerQueue[i]
+            re[i] = reading[0].toDouble() // Assuming x values are stored in the first position of the reading array
+        }
+
+        // Compute max value
+        val max = re.maxOrNull() ?: 0.0
+
+        // Use Apache Commons Math FFT implementation
+        val fft = FastFourierTransformer(DftNormalization.STANDARD)
+        fft.transform(re, TransformType.FORWARD)
+
+        // The transformed values are now in 're' and 'im' arrays
+
+        // Create a feature vector
+        val featureVector = DoubleArray(FEATURE_VECTOR_SIZE * 2 + 1) // +1 for label
+
+        // Compute FFT coefficients
+        for (i in re.indices) {
+            // Compute each coefficient magnitude
+            val mag = Math.sqrt(re[i] * re[i] + im[i] * im[i])
+            // Adding the computed FFT coefficient to the feature vector
+            featureVector[i] = mag
+            // Clear the field
+            im[i] = 0.0
+        }
+
+        // Append magnitudes after frequency components
+        for (i in 0 until FEATURE_VECTOR_SIZE) {
+            featureVector[FEATURE_VECTOR_SIZE + i] = re[i]
+        }
+
+        // Finally, append max after frequency components
+        featureVector[FEATURE_VECTOR_SIZE * 2] = max
+
+        return featureVector
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) { // called very time there is new data sent to the sensor
+        if (event != null && event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+            // make sure you are getting quality data, not null and from the correct sensor
+            // grab the data from the sensor
+            x = (event.values[0] / SensorManager.GRAVITY_EARTH).toDouble()
+            y = (event.values[1] / SensorManager.GRAVITY_EARTH).toDouble()
+            z = (event.values[2] / SensorManager.GRAVITY_EARTH).toDouble()
+
+            val magnitude = Math.sqrt(x * x + y * y + z * z)
+            currentTime = System.currentTimeMillis() // get time at shake
+            if (magnitude > 3 && currentTime - lastTime > 300) { //the shake is not just noise
+                lastTime = currentTime
+
+                // Store the values in the queue
+                val reading = floatArrayOf(x.toFloat(), y.toFloat(), z.toFloat())
+                accelerometerQueue.add(reading)
+
+                if (accelerometerQueue.size >= FEATURE_VECTOR_SIZE) {
+                    // Generate the feature vector
+                    val featureVector = generateFeatureVector()
+
+                    // Use WekaClassifier to classify the feature vector
+                    val classificationResult = wekaClassifier.classify(featureVector.toObjectArray())
+
+                    // Do something with the classification result
+                    // For example, print it
+                    Log.d("weka", "Weka Classification Result: $classificationResult")
+
+                    // Clear the queue after processing
+                    accelerometerQueue.clear()
+                }
+            }
+        }
+    }
+
+    // Add this extension function to convert DoubleArray to Object[]
+    fun DoubleArray.toObjectArray(): Array<Any> {
+        return Array(this.size) { this[it] as Any }
+    }
 
     // Register the receiver in onResume
     override fun onResume() {
         super.onResume()
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(TrackingService.LOCATION_UPDATE_ACTION))
+        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) // sensor object
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
     // Unregister the receiver in onPause to avoid memory leaks
     override fun onPause() {
         super.onPause()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        sensorManager.unregisterListener(this)
     }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {} // executed only when accuracy is changed, and you need to be aware of the change, not used in this class
 
 }

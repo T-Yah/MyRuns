@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
+import android.widget.Toast
 import com.example.myruns.R
 import com.example.teeya_li.ManualInput
 import com.example.teeya_li.MapActivity
@@ -52,8 +53,8 @@ class StartFragment : Fragment() {
 
                 val intent = Intent(requireContext(), MapActivity::class.java) //launch map activity
                 intent.putExtra("activity_position", selectedActivityPosition)
+                intent.putExtra("gpsOrAuto", selectedInputPosition)
                 startActivity(intent)
-
             }
         }
 
